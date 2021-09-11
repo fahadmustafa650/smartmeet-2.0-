@@ -8,10 +8,11 @@ import 'Employee/employee_screens/appointment_requests_screen.dart';
 import 'Employee/employee_screens/emp_sign_in_screen.dart';
 import 'Employee/employee_screens/emp_sign_up_screen.dart';
 import 'Visitor/Appointment/appointment_sent_screen.dart';
+import 'Visitor/Appointment/pending_appointments_screen.dart';
 import 'Visitor/Appointment/request_appoinment_screen.dart';
 import 'Visitor/Appointment/reserve_spot_employee_screen.dart';
 import 'Visitor/Appointment/search_employee_screen.dart';
-import 'Visitor/Appointment/booked_appointment_screen.dart';
+import 'Visitor/Appointment/visitor_booked_appointment_screen.dart';
 import 'Visitor/Appointment/search_result_screen.dart';
 import 'Visitor/Device steps/facial_recognition_step3.dart';
 import 'Visitor/Device steps/temperature_detector_step2.dart';
@@ -22,16 +23,18 @@ import 'Visitor/Visitor Verification Steps/qr_code_step1.dart';
 import 'Visitor/visitor_home_screen.dart';
 import 'providers/appointments_provider.dart';
 import 'providers/employee_provider.dart';
-import 'providers/sent_appointments_providers.dart';
+import 'providers/visitor_booked_appointments_providers.dart';
+import 'providers/visitor_pending_appointments.dart';
 import 'screens/chat_screen.dart';
 import 'screens/chating_screen.dart';
 import 'screens/contact_us.dart';
 import 'screens/edit_profile_screen.dart';
 import 'screens/enter_email_screen.dart';
 import 'screens/login_as_screen.dart';
-import 'screens/notifications_screen.dart';
+import 'Employee/employee_screens/employee_pending_screen.dart';
 import 'screens/onboarding_screens.dart';
 import 'screens/password_changed_successfully.dart';
+import 'screens/qr_code_screen.dart';
 import 'screens/splash_screen.dart';
 import 'screens/sign_up_as_screen.dart';
 import 'screens/test_api.dart';
@@ -51,19 +54,22 @@ class MyApp extends StatelessWidget {
           value: VisitorProvider(),
         ),
         ChangeNotifierProvider.value(
-          value: PendingAppointmentsRequestsProvider(),
+          value: EmployeePendingAppointmentsRequestsProvider(),
         ),
         ChangeNotifierProvider.value(
           value: EmployeesProvider(),
         ),
         ChangeNotifierProvider.value(
-          value: SentAppointmentRequestsProvider(),
+          value: AcceptedAppointmentRequestsProvider(),
+        ),
+        ChangeNotifierProvider.value(
+          value: VisitorPendingAppointmentsRequestsProvider(),
         ),
       ],
       child: MaterialApp(
         debugShowMaterialGrid: false,
-        home: BookedAppointmentsScreen(),
-        //initialRoute: EmployeeSearchBar.id,
+        home: EmployeeSignInScreen(),
+        // initialRoute: RequestAppointmentScreen.id,
         debugShowCheckedModeBanner: false,
         routes: {
           AppointmentRequestsScreen.id: (context) =>
@@ -77,6 +83,8 @@ class MyApp extends StatelessWidget {
           EditProfileScreen.id: (context) => EditProfileScreen(),
           EmployeeSearchBar.id: (context) => EmployeeSearchBar(),
           EmployeeHomeScreen.id: (context) => EmployeeHomeScreen(),
+          EmployeePendingAppointments.id: (context) =>
+              EmployeePendingAppointments(),
           EmployeeSearchResultScreen.id: (context) =>
               EmployeeSearchResultScreen(),
           EmployeeSignInScreen.id: (context) => EmployeeSignInScreen(),
@@ -86,6 +94,8 @@ class MyApp extends StatelessWidget {
           LoginAsScreen.id: (context) => LoginAsScreen(),
           //MapScreen.id: (context) => MapScreen(),
           MaskDetectionStep4.id: (context) => MaskDetectionStep4(),
+          VisitorPendingAppointmentsScreen.id: (context) =>
+              VisitorPendingAppointmentsScreen(),
           OnBoardingScreens.id: (context) => OnBoardingScreens(),
           RequestAppointmentScreen.id: (context) => RequestAppointmentScreen(),
           ReserveEmployeeSpotScreen.id: (context) =>

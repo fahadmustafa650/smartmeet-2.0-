@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:smart_meet/Visitor/Appointment/pending_appointments_screen.dart';
 import 'package:smart_meet/Visitor/Appointment/search_employee_screen.dart';
 import 'package:smart_meet/Visitor/Visitor%20Authentication/visitor_sign_in_screen.dart';
 import 'package:smart_meet/providers/visitor_provider.dart';
 import 'package:smart_meet/screens/chat_screen.dart';
 import 'package:smart_meet/screens/edit_profile_screen.dart';
 import 'package:smart_meet/widgets/info_panel.dart';
-import 'Appointment/booked_appointment_screen.dart';
+import 'Appointment/visitor_booked_appointment_screen.dart';
 import 'Visitor Verification Steps/booked_appointment_qrcode.dart';
 
 class VisitorHomeScreen extends StatefulWidget {
@@ -162,6 +163,16 @@ class _VisitorHomeScreenState extends State<VisitorHomeScreen> {
                 title: 'Booked\nAppointments',
                 textIconColor: Colors.yellow[800],
                 iconData: FontAwesomeIcons.addressCard),
+          ),
+          GestureDetector(
+            onTap: () {
+              Navigator.pushNamed(context, VisitorPendingAppointmentsScreen.id);
+            },
+            child: InfoPanel(
+              title: 'Pending\nAppointments',
+              textIconColor: Colors.blue,
+              iconData: Icons.person,
+            ),
           ),
           GestureDetector(
             onTap: () {

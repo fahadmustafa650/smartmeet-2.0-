@@ -6,8 +6,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:smart_meet/Constants/constants.dart';
-import 'package:smart_meet/models/employee_model.dart';
-import 'package:smart_meet/providers/employee_provider.dart';
 import 'package:smart_meet/providers/visitor_provider.dart';
 
 class EditProfileScreen extends StatelessWidget {
@@ -151,7 +149,7 @@ class _EditProfileFormState extends State<EditProfileForm> {
 
   @override
   Widget build(BuildContext context) {
-    final employeeData = Provider.of<EmployeesProvider>(context);
+    final visitorData = Provider.of<VisitorProvider>(context);
     return Form(
       key: _formKey,
       child: SingleChildScrollView(
@@ -180,9 +178,8 @@ class _EditProfileFormState extends State<EditProfileForm> {
                           )),
                       CircleAvatar(
                         radius: 128,
-                        backgroundImage: employeeData.getEmployee.imageUrl !=
-                                null
-                            ? NetworkImage(employeeData.getEmployee.imageUrl)
+                        backgroundImage: visitorData.getVisitor.imageUrl != null
+                            ? NetworkImage(visitorData.getVisitor.imageUrl)
                             : AssetImage('assets/images/blank_pic.jpg'),
                       ),
                     ],
@@ -195,7 +192,7 @@ class _EditProfileFormState extends State<EditProfileForm> {
               style: loginTextFieldsStyles,
               //controller: _nameController,
               initialValue:
-                  '${employeeData.getEmployee.firstName} ${employeeData.getEmployee.lastName}',
+                  '${visitorData.getVisitor.firstName} ${visitorData.getVisitor.lastName}',
               validator: (value) {
                 if (value.isEmpty) {
                   return "Please Enter Text";
@@ -221,7 +218,7 @@ class _EditProfileFormState extends State<EditProfileForm> {
               obscureText: false,
               style: loginTextFieldsStyles,
               //controller: _userNameController,
-              initialValue: employeeData.getEmployee.username,
+              initialValue: visitorData.getVisitor.username,
               validator: (value) {
                 if (value.isEmpty) {
                   return "Please Enter Text";
@@ -245,7 +242,7 @@ class _EditProfileFormState extends State<EditProfileForm> {
             TextFormField(
               obscureText: false,
               style: loginTextFieldsStyles,
-              initialValue: employeeData.getEmployee.email,
+              initialValue: visitorData.getVisitor.email,
               //controller: _emailController,
               keyboardType: TextInputType.emailAddress,
               validator: (value) {
@@ -273,7 +270,7 @@ class _EditProfileFormState extends State<EditProfileForm> {
               style: loginTextFieldsStyles,
               //controller: _phoneNoController,
               initialValue: DateFormat.yMMMMd('en_US')
-                  .format(employeeData.getEmployee.dateOfBirth),
+                  .format(visitorData.getVisitor.dateOfBirth),
               validator: (value) {
                 if (value.isEmpty) {
                   return "Please Enter Text";

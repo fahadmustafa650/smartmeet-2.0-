@@ -3,35 +3,38 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:smart_meet/Visitor/Appointment/appointment_sent_screen.dart';
 import 'package:smart_meet/Visitor/Visitor%20Verification%20Steps/booked_appointment_qrcode.dart';
 import 'package:smart_meet/models/sent_appointment_model.dart';
-import 'package:smart_meet/providers/sent_appointments_providers.dart';
+import 'package:smart_meet/providers/employee_provider.dart';
+import 'package:smart_meet/providers/visitor_booked_appointments_providers.dart';
 import 'package:http/http.dart' as http;
-import 'reserve_spot_employee_screen.dart';
-import 'search_employee_screen.dart';
 
 class BookedAppointmentsScreen extends StatefulWidget {
-  static final id = '/booked_appointment_result';
+  static final id = '/employee_booked_appointment_result';
   @override
   _BookedAppointmentsScreenState createState() =>
       _BookedAppointmentsScreenState();
 }
 
 class _BookedAppointmentsScreenState extends State<BookedAppointmentsScreen> {
-  List<SentAppointment> _appointmentPendingRequests = [];
   bool _isInit = false;
   bool _isLoading = true;
   void fetchAndGetData() async {
-    // String visitorId = '61292ccba64b18000460842a';
-    String visitorId = '61292ccba64b18000460842b';
+    String employeeId =
+        Provider.of<EmployeesProvider>(context, listen: false).getEmployee.id;
+    String name = Provider.of<EmployeesProvider>(context, listen: false)
+        .getEmployee
+        .firstName;
+    print('logIn=$employeeId');
+    print('name=$name');
+    if (employeeId == null) {
+      return;
+    }
     try {
-      await Provider.of<SentAppointmentRequestsProvider>(context, listen: false)
-          .sentAppointmentRequestsList(visitorId)
+      await Provider.of<AcceptedAppointmentRequestsProvider>(context,
+              listen: false)
+          .acceptedAppointmentRequestsList(employeeId)
           .then((_) {
-        _appointmentPendingRequests =
-            Provider.of<SentAppointmentRequestsProvider>(context, listen: false)
-                .getSentAppointmentRequests;
         setState(() {
           _isLoading = false;
         });
@@ -58,10 +61,19 @@ class _BookedAppointmentsScreenState extends State<BookedAppointmentsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    List<SentAppointment> _appointmentPendingRequests =
+        Provider.of<AcceptedAppointmentRequestsProvider>(context, listen: false)
+            .getSentAppointmentRequests;
     // final screenWidth = MediaQuery.of(context).size.width;
     // final screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: Icon(Icons.arrow_back, color: Colors.white),
+        ),
         title: Text('Booked Appointments'),
         centerTitle: true,
       ),
@@ -74,12 +86,7 @@ class _BookedAppointmentsScreenState extends State<BookedAppointmentsScreen> {
                   employeeId: _appointmentPendingRequests[index].employeeId,
                   date: DateTime.parse(
                       _appointmentPendingRequests[index].date.toString()),
-                  startTime: TimeOfDay.fromDateTime(
-                    DateTime.now(),
-                  ),
-                  endTime: TimeOfDay.fromDateTime(
-                    DateTime.now(),
-                  ),
+                  timeSlot: _appointmentPendingRequests[index].timeSlot,
                 );
               },
             ),
@@ -90,15 +97,12 @@ class _BookedAppointmentsScreenState extends State<BookedAppointmentsScreen> {
 class EmployeeBookedInfo extends StatefulWidget {
   final String employeeId;
   final DateTime date;
-  final TimeOfDay startTime;
-  final TimeOfDay endTime;
+  final String timeSlot;
 
   const EmployeeBookedInfo({
-    Key key,
     @required this.employeeId,
     @required this.date,
-    @required this.startTime,
-    @required this.endTime,
+    @required this.timeSlot,
   });
 
   @override
@@ -137,8 +141,8 @@ class _EmployeeBookedInfoState extends State<EmployeeBookedInfo> {
 
   @override
   Widget build(BuildContext context) {
-    print(widget.startTime);
-    print(widget.endTime);
+    print(widget.timeSlot);
+
     final screenWidth = MediaQuery.of(context).size.width;
     // final screenHeight = MediaQuery.of(context).size.height;
     return _isLoading
@@ -184,7 +188,7 @@ class _EmployeeBookedInfoState extends State<EmployeeBookedInfo> {
                             width: 30,
                           ),
                           Text(
-                            '${widget.startTime.format(context)} - ${widget.endTime.format(context)}',
+                            widget.timeSlot,
                             style: TextStyle(
                                 color: Colors.black,
                                 fontSize: 14,

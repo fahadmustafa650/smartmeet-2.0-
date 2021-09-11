@@ -90,7 +90,7 @@ class _VisitorSignInScreenState extends State<VisitorSignInScreen> {
         ),
         height: 40.0,
         child: TextButton(
-            onPressed: () async {
+            onPressed: () {
               signIn();
               // Navigator.pushNamed(context, VisitorHomeScreen.id);
             },

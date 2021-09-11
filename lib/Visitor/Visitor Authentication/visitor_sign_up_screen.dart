@@ -198,8 +198,7 @@ class _VisitorSignUpScreenState extends State<VisitorSignUpScreen> {
       return;
     }
     _formKey.currentState.save();
-    // await _addVisitorData(context);
-    print('data added');
+
     Navigator.push(
       context,
       MaterialPageRoute(

@@ -20,7 +20,7 @@ class VisitorProvider with ChangeNotifier {
     // Uint8List imageList = Uint8List.fromList(imageData);
     // this.imageList = imageList;
     _visitor = Visitor(
-      id: visitorData['user']['id'].toString(),
+      id: visitorData['user']['_id'].toString(),
       firstName: visitorData['user']['firstName'].toString(),
       lastName: visitorData['user']['lastName'].toString(),
       username: visitorData['user']['username'].toString(),

@@ -14,21 +14,21 @@ class GetImage extends StatefulWidget {
 }
 
 class _GetImageState extends State<GetImage> {
-  final url = Uri.parse(
-      'https://pure-woodland-42301.herokuapp.com/api/visitor/fahsdfssssvvssdsddddddjssssjhdgjddksssddslfjs11@gmail.com/avatar');
-  var extractedData;
+  String imageUrl;
   var isLoading = true;
   void getData() async {
+    final url = Uri.parse(
+        'https://pure-woodland-42301.herokuapp.com/api/visitor/acceptedrequest/qrcode/61292ccba64b18000460842a');
     final response = await http.get(url);
-    extractedData = await json.decode(response.body);
+    // final extractedData = json.decode(response.body)['data'];
+    imageUrl = response.body;
+    final a = imageUrl.indexOf(',');
+    imageUrl = imageUrl.substring(a + 1, imageUrl.length);
 
-    if (extractedData == null) {
-      return;
-    }
     setState(() {
       isLoading = false;
     });
-    print(extractedData);
+    // print(extractedData);
   }
 
   void initState() {
@@ -38,14 +38,24 @@ class _GetImageState extends State<GetImage> {
 
   @override
   Widget build(BuildContext context) {
-    final appointment =
-        Provider.of<PendingAppointmentsRequestsProvider>(context);
-    return Center(
-        child: TextButton(
-      onPressed: () {
-        appointment.pendingAppointmentRequestsList('612c967d21b51e000445207d');
-      },
-      child: Text('Get Data'),
+    return Scaffold(
+        body: Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          TextButton(
+            onPressed: getData,
+            child: Text('Get Data'),
+          ),
+          isLoading
+              ? Center(
+                  child: CircularProgressIndicator(),
+                )
+              : Image(
+                  image: MemoryImage(base64Decode(imageUrl)),
+                )
+        ],
+      ),
     ));
   }
 }

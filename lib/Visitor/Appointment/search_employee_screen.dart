@@ -10,7 +10,13 @@ class EmployeeSearchBar extends StatefulWidget {
 }
 
 class _EmployeeSearchBarState extends State<EmployeeSearchBar> {
-  TextEditingController editingController = TextEditingController();
+  TextEditingController searchController = TextEditingController();
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    searchController.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +31,7 @@ class _EmployeeSearchBarState extends State<EmployeeSearchBar> {
             Container(
               margin: EdgeInsets.symmetric(horizontal: 20),
               child: TextFormField(
-                controller: editingController,
+                controller: searchController,
                 decoration: InputDecoration(
                     labelText: "Search Employee",
                     hintText: "Search Employee",
@@ -39,7 +45,12 @@ class _EmployeeSearchBarState extends State<EmployeeSearchBar> {
             ),
             GestureDetector(
               onTap: () {
-                Navigator.pushNamed(context, EmployeeSearchResultScreen.id);
+                // Navigator.pushNamed(context, EmployeeSearchResultScreen(name: searchController.text.toString()));
+                Navigator.push(context, MaterialPageRoute(builder: (ctx) {
+                  return EmployeeSearchResultScreen(
+                    name: searchController.text.toString(),
+                  );
+                }));
               },
               child: Container(
                 width: MediaQuery.of(context).size.width * 0.6,

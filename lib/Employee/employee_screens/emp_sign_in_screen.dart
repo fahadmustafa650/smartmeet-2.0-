@@ -27,7 +27,7 @@ class _EmployeeSignInScreenState extends State<EmployeeSignInScreen> {
 
   void signIn() async {
     final url = Uri.parse(
-        'https://pure-woodland-42301.herokuapp.com/api/visitor/signin');
+        'https://pure-woodland-42301.herokuapp.com/api/employee/signin');
     try {
       final response = await http.post(
         url,
@@ -40,7 +40,8 @@ class _EmployeeSignInScreenState extends State<EmployeeSignInScreen> {
         }),
       );
       print(response.statusCode);
-      Navigator.pushNamed(context, VisitorHomeScreen.id);
+      Navigator.pushNamed(context, EmployeeHomeScreen.id,
+          arguments: {'email': _emailController.text.toString()});
     } catch (error) {
       throw error;
     }
@@ -48,51 +49,28 @@ class _EmployeeSignInScreenState extends State<EmployeeSignInScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Widget resgisterButton() {
-      return Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text('Don\'t have an account?'),
-          SizedBox(
-            width: 10.0,
-          ),
-          GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => EmployeeSignUpScreen()),
-              );
-            },
-            child: Text(
-              'Register',
-              style: TextStyle(
-                  color: Colors.blue[700], fontWeight: FontWeight.bold),
-            ),
-          )
-        ],
-      );
-    }
-
     final signInBtn = Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.all(Radius.circular(8.0)),
-          color: Colors.lightBlueAccent,
-        ),
-        height: 40.0,
-        child: TextButton(
-            onPressed: () {
-              Navigator.pushNamed(context, EmployeeHomeScreen.id);
-            },
-            child: Center(
-              child: FittedBox(
-                child: Text(
-                  'Login',
-                  style: TextStyle(
-                    color: Colors.white,
-                  ),
-                ),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.all(Radius.circular(8.0)),
+        color: Colors.lightBlueAccent,
+      ),
+      height: 40.0,
+      child: TextButton(
+        onPressed: () {
+          signIn();
+        },
+        child: Center(
+          child: FittedBox(
+            child: Text(
+              'Sign In',
+              style: TextStyle(
+                color: Colors.white,
               ),
-            )));
+            ),
+          ),
+        ),
+      ),
+    );
 
     return Scaffold(
       backgroundColor: Colors.lightBlueAccent,
@@ -173,6 +151,31 @@ class _EmployeeSignInScreenState extends State<EmployeeSignInScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget resgisterButton() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text('Don\'t have an account?'),
+        SizedBox(
+          width: 10.0,
+        ),
+        GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => EmployeeSignUpScreen()),
+            );
+          },
+          child: Text(
+            'Register',
+            style:
+                TextStyle(color: Colors.blue[700], fontWeight: FontWeight.bold),
+          ),
+        )
+      ],
     );
   }
 

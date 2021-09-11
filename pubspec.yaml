@@ -29,6 +29,7 @@ dependencies:
   intl: ^0.17.0
   firebase_storage: 
   firebase_core: 
+  date_time_picker: "^2.1.0"
 
 
 

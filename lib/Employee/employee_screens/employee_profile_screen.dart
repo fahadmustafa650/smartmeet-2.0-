@@ -1,24 +1,130 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:smart_meet/Employee/employee_screens/employee_pending_screen.dart';
+import 'package:smart_meet/Visitor/Appointment/pending_appointments_screen.dart';
+import 'package:smart_meet/Visitor/Appointment/search_employee_screen.dart';
+import 'package:smart_meet/Visitor/Visitor%20Authentication/visitor_sign_in_screen.dart';
+import 'package:smart_meet/providers/employee_provider.dart';
+import 'package:smart_meet/providers/visitor_provider.dart';
 import 'package:smart_meet/screens/chat_screen.dart';
 import 'package:smart_meet/screens/edit_profile_screen.dart';
 import 'package:smart_meet/widgets/info_panel.dart';
-import 'appointment_requests_screen.dart';
 
-class EmployeeHomeScreen extends StatelessWidget {
+class EmployeeHomeScreen extends StatefulWidget {
   static final id = '/employee_home_screen';
+
+  @override
+  _EmployeeHomeScreenState createState() => _EmployeeHomeScreenState();
+}
+
+class _EmployeeHomeScreenState extends State<EmployeeHomeScreen> {
+  bool _isInit;
+  bool _isLoading = false;
+  @override
+  void initState() {
+    super.initState();
+    _isInit = true;
+  }
+
+  @override
+  void didChangeDependencies() async {
+    super.didChangeDependencies();
+    if (_isInit) {
+      //await Provider.of<Visitors>(context).getVisitorData(args['email']);
+      setState(() {
+        _isLoading = true;
+      });
+      final args =
+          ModalRoute.of(context).settings.arguments as Map<String, String>;
+      await Provider.of<EmployeesProvider>(context)
+          .getEmployeeData(args['email']);
+    }
+    setState(() {
+      _isInit = false;
+      _isLoading = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    final employeeData = Provider.of<EmployeesProvider>(context).getEmployee;
     final screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       backgroundColor: Color(0XFFFFFFFF),
-      drawer: customDrawer(context),
+      drawer: !_isLoading
+          ? Drawer(
+              child: ListView(
+                padding: EdgeInsets.all(0),
+                children: <Widget>[
+                  UserAccountsDrawerHeader(
+                    accountEmail: employeeData.email == null
+                        ? CircularProgressIndicator()
+                        : Text(employeeData.email),
+                    accountName: employeeData.firstName == null ||
+                            employeeData.lastName == null
+                        ? CircularProgressIndicator()
+                        : Text(
+                            '${employeeData.firstName} ${employeeData.lastName}'),
+                    currentAccountPicture: _isLoading
+                        ? CircularProgressIndicator()
+                        : CircleAvatar(
+                            radius: 100,
+                            backgroundImage: _isLoading
+                                ? AssetImage('assets/images/blank_pic.jpg')
+                                : NetworkImage(employeeData.imageUrl),
+                          ),
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.person),
+                    title: Text("Edit Profile"),
+                    onTap: () {
+                      Navigator.pushNamed(context, EditProfileScreen.id);
+                    },
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.dashboard),
+                    title: Text("Book Appointment"),
+                    onTap: () {
+                      // print("Categories Clicked");
+                    },
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.add_to_photos),
+                    title: Text("Reports"),
+                    onTap: () {
+                      //print("Add Clicked");
+                    },
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.message),
+                    title: Text("Chat"),
+                    onTap: () {
+                      Navigator.pushNamed(context, ChatScreen.id);
+                    },
+                  ),
+                  ListTile(
+                    leading: Icon(
+                      Icons.logout,
+                    ),
+                    title: Text("Logout"),
+                    onTap: () {},
+                  ),
+                ],
+              ),
+            )
+          : Container(),
       appBar: AppBar(
         backgroundColor: Colors.lightBlue,
-        title: Text(
-          'Employee Name',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
+        title: _isLoading
+            ? CircularProgressIndicator(
+                backgroundColor: Colors.white,
+              )
+            : Text(
+                ('${employeeData.firstName} ${employeeData.lastName}'),
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
+              ),
         centerTitle: true,
       ),
       body: GridView.count(
@@ -27,162 +133,87 @@ class EmployeeHomeScreen extends StatelessWidget {
         crossAxisSpacing: 25,
         padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
         children: [
-          appointmentsRequestBtn(context),
-          chatBtn(context),
-          bookedAppointments(context),
-          editProfileBtn(context),
-          reportsBtn(context),
-          logoutBtn(context),
-        ],
-      ),
-    );
-  }
-
-  GestureDetector reportsBtn(BuildContext context) {
-    return GestureDetector(
-      child: InfoPanel(
-          title: 'Reports',
-          textIconColor: Colors.black,
-          iconData: Icons.report),
-    );
-  }
-
-  GestureDetector bookedAppointments(BuildContext context) {
-    return GestureDetector(
-      child: InfoPanel(
-          title: 'Booked\nAppointments',
-          textIconColor: Colors.yellow[800],
-          iconData: FontAwesomeIcons.addressCard),
-    );
-  }
-
-  Widget customDrawer(BuildContext context) {
-    return Drawer(
-      child: ListView(
-        padding: EdgeInsets.all(0),
-        children: <Widget>[
-          UserAccountsDrawerHeader(
-            accountEmail: Text("fahadkhan123@email.com"),
-            accountName: Text("Fahad Mustafa"),
-            currentAccountPicture: CircleAvatar(
-              radius: 100,
-              backgroundImage: AssetImage('assets/images/profilepic.jpeg'),
+          GestureDetector(
+            onTap: () {
+              //  Navigator.pushNamed(context, EmployeeSearchBar.id);
+            },
+            child: InfoPanel(
+              title: 'Booked Appointment',
+              textIconColor: Colors.yellow[900],
+              iconData: Icons.approval,
             ),
           ),
-          ListTile(
-            leading: Icon(Icons.person),
-            title: Text("Edit Profile"),
-            onTap: () {
-              Navigator.pushNamed(context, EditProfileScreen.id);
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.dashboard),
-            title: Text("Appointment Requests"),
-            onTap: () {
-              // print("Categories Clicked");
-              Navigator.pushNamed(context, AppointmentRequestsScreen.id);
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.add_to_photos),
-            title: Text("Reports"),
-            onTap: () {
-              //print("Add Clicked");
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.message),
-            title: Text("Chat"),
+          GestureDetector(
             onTap: () {
               Navigator.pushNamed(context, ChatScreen.id);
             },
-          ),
-          ListTile(
-            leading: Icon(
-              Icons.logout,
+            child: InfoPanel(
+              // bgColor: Color(0XFFA1F8AF).withOpacity(0.4),
+              title: 'Chat',
+              textIconColor: Colors.green[400],
+              iconData: Icons.chat,
             ),
-            title: Text("Logout"),
-            onTap: () {},
           ),
+          GestureDetector(
+            onTap: () {
+              Navigator.pushNamed(context, EmployeePendingAppointments.id);
+            },
+            child: InfoPanel(
+              title: 'Booked\nAppointments',
+              textIconColor: Colors.yellow[800],
+              iconData: FontAwesomeIcons.addressCard,
+            ),
+          ),
+          GestureDetector(
+            onTap: () {
+              Navigator.pushNamed(context, EmployeePendingAppointments.id);
+            },
+            child: InfoPanel(
+              title: 'Pending\nAppointments',
+              textIconColor: Colors.blue,
+              iconData: Icons.person,
+            ),
+          ),
+          GestureDetector(
+            onTap: () {
+              Navigator.pushNamed(context, EditProfileScreen.id);
+            },
+            child: InfoPanel(
+              title: 'Edit Profile',
+              textIconColor: Colors.blue,
+              iconData: Icons.person,
+            ),
+          ),
+          GestureDetector(
+            onTap: () {},
+            child: InfoPanel(
+                title: 'Reports',
+                textIconColor: Colors.black,
+                iconData: Icons.report),
+          ),
+          GestureDetector(
+            onTap: () {
+              // Navigator.push(context,
+              //     MaterialPageRoute(builder: (context) => MXPSchoolPickup()));
+              clearLoginData();
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => VisitorSignInScreen()));
+            },
+            child: InfoPanel(
+              title: 'Logout',
+              textIconColor: Colors.red,
+              iconData: Icons.logout,
+            ),
+          )
         ],
       ),
     );
   }
 
-  Widget editProfileBtn(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.pushNamed(context, EditProfileScreen.id);
-      },
-      child: InfoPanel(
-        title: 'Edit Profile',
-        textIconColor: Colors.blue,
-        iconData: Icons.person,
-      ),
-    );
-  }
-
-  Widget chatBtn(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.pushNamed(context, ChatScreen.id);
-      },
-      child: InfoPanel(
-        // bgColor: Color(0XFFA1F8AF).withOpacity(0.4),
-        title: 'Chat',
-        textIconColor: Colors.green[400],
-        iconData: Icons.chat,
-      ),
-    );
-  }
-
-  Widget appointmentsRequestBtn(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.pushNamed(context, AppointmentRequestsScreen.id);
-      },
-      child: InfoPanel(
-        title: 'Appointment\nRequests',
-        textIconColor: Colors.yellow[900],
-        iconData: Icons.approval,
-      ),
-    );
-  }
-
-  Widget busScheduleBtn() {
-    return GestureDetector(
-      onTap: () {},
-      child: InfoPanel(
-        title: '',
-        textIconColor: Color(0XFFAC4141),
-        iconData: Icons.bus_alert,
-      ),
-    );
-  }
-
-  Widget workPickupBtn() {
-    return GestureDetector(
-      onTap: () {},
-      child: InfoPanel(
-        title: 'Work pickup',
-        textIconColor: Color(0XFFFFB110),
-        iconData: Icons.work,
-      ),
-    );
-  }
-
-  Widget logoutBtn(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        // Navigator.push(context,
-        //     MaterialPageRoute(builder: (context) => MXPSchoolPickup()));
-      },
-      child: InfoPanel(
-        title: 'Logout',
-        textIconColor: Colors.red,
-        iconData: Icons.logout,
-      ),
-    );
+  void clearLoginData() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    await preferences.clear();
   }
 }
