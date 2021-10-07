@@ -2,15 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:smart_meet/Employee/employee_screens/employee_pending_screen.dart';
-import 'package:smart_meet/Visitor/Appointment/pending_appointments_screen.dart';
+import 'package:smart_meet/Constants/constants.dart';
+import 'package:smart_meet/Employee/employee_screens/employee_pending_appointments_screen.dart';
+import 'package:smart_meet/Visitor/Appointment/visitor_pending_appointments_screen.dart';
 import 'package:smart_meet/Visitor/Appointment/search_employee_screen.dart';
 import 'package:smart_meet/Visitor/Visitor%20Authentication/visitor_sign_in_screen.dart';
 import 'package:smart_meet/providers/employee_provider.dart';
 import 'package:smart_meet/providers/visitor_provider.dart';
 import 'package:smart_meet/screens/chat_screen.dart';
-import 'package:smart_meet/screens/edit_profile_screen.dart';
+import 'package:smart_meet/screens/login_as_screen.dart';
 import 'package:smart_meet/widgets/info_panel.dart';
+//import 'package:smart_meet/Employee/employee_screen/employee_booked_appointment.dart';
+import 'package:smart_meet/Employee/employee_screens/employee_booked_appointment.dart';
+
+import 'employee_edit_profile_screen.dart';
 
 class EmployeeHomeScreen extends StatefulWidget {
   static final id = '/employee_home_screen';
@@ -31,7 +36,8 @@ class _EmployeeHomeScreenState extends State<EmployeeHomeScreen> {
   @override
   void didChangeDependencies() async {
     super.didChangeDependencies();
-    if (_isInit) {
+    if (_isInit &&
+        Provider.of<EmployeesProvider>(context).getEmployee.id == null) {
       //await Provider.of<Visitors>(context).getVisitorData(args['email']);
       setState(() {
         _isLoading = true;
@@ -39,7 +45,7 @@ class _EmployeeHomeScreenState extends State<EmployeeHomeScreen> {
       final args =
           ModalRoute.of(context).settings.arguments as Map<String, String>;
       await Provider.of<EmployeesProvider>(context)
-          .getEmployeeData(args['email']);
+          .getEmployeeDataByEmail(args['email']);
     }
     setState(() {
       _isInit = false;
@@ -49,7 +55,8 @@ class _EmployeeHomeScreenState extends State<EmployeeHomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final employeeData = Provider.of<EmployeesProvider>(context).getEmployee;
+    final employeeData =
+        Provider.of<EmployeesProvider>(context, listen: true).getEmployee;
     final screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       backgroundColor: Color(0XFFFFFFFF),
@@ -80,16 +87,17 @@ class _EmployeeHomeScreenState extends State<EmployeeHomeScreen> {
                     leading: Icon(Icons.person),
                     title: Text("Edit Profile"),
                     onTap: () {
-                      Navigator.pushNamed(context, EditProfileScreen.id);
+                      Navigator.pushNamed(
+                          context, EmployeeEditProfileScreen.id);
                     },
                   ),
-                  ListTile(
-                    leading: Icon(Icons.dashboard),
-                    title: Text("Book Appointment"),
-                    onTap: () {
-                      // print("Categories Clicked");
-                    },
-                  ),
+                  // ListTile(
+                  //   leading: Icon(Icons.dashboard),
+                  //   title: Text("Book Appointment"),
+                  //   onTap: () {
+                  //     // print("Categories Clicked");
+                  //   },
+                  // ),
                   ListTile(
                     leading: Icon(Icons.add_to_photos),
                     title: Text("Reports"),
@@ -109,7 +117,9 @@ class _EmployeeHomeScreenState extends State<EmployeeHomeScreen> {
                       Icons.logout,
                     ),
                     title: Text("Logout"),
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.pushNamed(context, LoginAsScreen.id);
+                    },
                   ),
                 ],
               ),
@@ -118,9 +128,7 @@ class _EmployeeHomeScreenState extends State<EmployeeHomeScreen> {
       appBar: AppBar(
         backgroundColor: Colors.lightBlue,
         title: _isLoading
-            ? CircularProgressIndicator(
-                backgroundColor: Colors.white,
-              )
+            ? threeBounceSpinkit
             : Text(
                 ('${employeeData.firstName} ${employeeData.lastName}'),
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
@@ -133,16 +141,16 @@ class _EmployeeHomeScreenState extends State<EmployeeHomeScreen> {
         crossAxisSpacing: 25,
         padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
         children: [
-          GestureDetector(
-            onTap: () {
-              //  Navigator.pushNamed(context, EmployeeSearchBar.id);
-            },
-            child: InfoPanel(
-              title: 'Booked Appointment',
-              textIconColor: Colors.yellow[900],
-              iconData: Icons.approval,
-            ),
-          ),
+          // GestureDetector(
+          //   onTap: () {
+          //     //  Navigator.pushNamed(context, EmployeeSearchBar.id);
+          //   },
+          //   child: InfoPanel(
+          //     title: 'Booked Appointment',
+          //     textIconColor: Colors.yellow[900],
+          //     iconData: Icons.approval,
+          //   ),
+          // ),
           GestureDetector(
             onTap: () {
               Navigator.pushNamed(context, ChatScreen.id);
@@ -156,7 +164,7 @@ class _EmployeeHomeScreenState extends State<EmployeeHomeScreen> {
           ),
           GestureDetector(
             onTap: () {
-              Navigator.pushNamed(context, EmployeePendingAppointments.id);
+              Navigator.pushNamed(context, EmployeeBookedAppointmentsScreen.id);
             },
             child: InfoPanel(
               title: 'Booked\nAppointments',
@@ -176,7 +184,7 @@ class _EmployeeHomeScreenState extends State<EmployeeHomeScreen> {
           ),
           GestureDetector(
             onTap: () {
-              Navigator.pushNamed(context, EditProfileScreen.id);
+              Navigator.pushNamed(context, EmployeeEditProfileScreen.id);
             },
             child: InfoPanel(
               title: 'Edit Profile',
