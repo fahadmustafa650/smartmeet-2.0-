@@ -6,14 +6,15 @@ import 'package:http/http.dart' as http;
 import 'new_password_screen.dart';
 import 'package:http/http.dart';
 
-class EnterEmailScreen extends StatefulWidget {
+class VisitorEnterEmailScreen extends StatefulWidget {
   static final id = '/enter_email_screen';
 
   @override
-  _EnterEmailScreenState createState() => _EnterEmailScreenState();
+  _VisitorEnterEmailScreenState createState() =>
+      _VisitorEnterEmailScreenState();
 }
 
-class _EnterEmailScreenState extends State<EnterEmailScreen> {
+class _VisitorEnterEmailScreenState extends State<VisitorEnterEmailScreen> {
   final _emailController = TextEditingController();
 
   void goToNewPasswordScreen() {

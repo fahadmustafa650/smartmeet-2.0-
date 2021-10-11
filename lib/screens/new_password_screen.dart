@@ -23,7 +23,7 @@ class NewPasswordScreen extends StatelessWidget {
       body: jsonEncode(
           <String, String>{'email': email, 'newpass': _newPassword.text}),
     );
-    Navigator.pushNamed(context, PasswordChanged.id);
+    Navigator.pushNamed(context, PasswordChangedSuccess.id);
     print('upadtePassword');
     print(response.statusCode);
   }
