@@ -1,15 +1,14 @@
 import 'package:flutter/foundation.dart';
 
-class PendingAppointment {
+class Appointment {
   final String id;
   final String visitorId;
   final String employeeId;
-  final bool isAccepted = false;
   final String companyName;
   final DateTime date;
   final String timeSlot;
   final String message;
-  PendingAppointment({
+  Appointment({
     @required this.id,
     @required this.visitorId,
     @required this.employeeId,

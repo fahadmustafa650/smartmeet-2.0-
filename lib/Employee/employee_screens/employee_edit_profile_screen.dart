@@ -1,15 +1,25 @@
+import 'dart:convert';
 import 'dart:io';
-
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:path/path.dart' as p;
+import 'package:path/path.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:smart_meet/Constants/constants.dart';
+import 'package:smart_meet/Employee/employee_screens/employee_home_screen.dart';
+import 'package:smart_meet/Visitor/visitor_home_screen.dart';
+import 'package:smart_meet/models/employee_model.dart';
+import 'package:smart_meet/providers/employee_provider.dart';
 import 'package:smart_meet/providers/visitor_provider.dart';
+import 'package:http/http.dart' as http;
+import 'package:smart_meet/api/firebase_api.dart';
 
-class EditProfileScreen extends StatelessWidget {
-  static final id = '/edit_profile_screen';
+class EmployeeEditProfileScreen extends StatelessWidget {
+  static final id = '/employee_edit_profile_screen';
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -49,11 +59,47 @@ class EditProfileForm extends StatefulWidget {
 class _EditProfileFormState extends State<EditProfileForm> {
   final _formKey = GlobalKey<FormState>();
   File _image;
-  void updateForm() {
+  String _imageUrl;
+  UploadTask task;
+  String _firstName;
+  String _lastName;
+
+  @override
+  void initState() {
+    Future.delayed(Duration.zero).then(
+      (_) {
+        // print('fName=${visitorData.firstName.toString()}');
+        // print('lName=${visitorData.lastName.toString()}');
+      },
+    );
+    super.initState();
+  }
+
+  Future<void> uploadFile() async {
+    if (_image == null) return;
+    final fileName = basename(_image.path);
+
+    final destination = 'files/$fileName';
+    try {
+      task = FirebaseApi.uploadFile(destination, _image);
+    } catch (error) {
+      print(error);
+    }
+
+    setState(() {});
+    if (task == null) return;
+    final snapshot = await task.whenComplete(() {});
+    final urlDownload = await snapshot.ref.getDownloadURL();
+    _imageUrl = urlDownload;
+
+    print('Download-Link: $urlDownload');
+  }
+
+  void _updateForm() {
     final isValid = _formKey.currentState.validate();
     if (isValid) {
       //TODO: Enter Backend code to submit form
-
+      print('valid');
     }
   }
 
@@ -149,7 +195,8 @@ class _EditProfileFormState extends State<EditProfileForm> {
 
   @override
   Widget build(BuildContext context) {
-    final visitorData = Provider.of<VisitorProvider>(context);
+    final employeeData = Provider.of<EmployeesProvider>(context);
+
     return Form(
       key: _formKey,
       child: SingleChildScrollView(
@@ -169,17 +216,15 @@ class _EditProfileFormState extends State<EditProfileForm> {
                     children: <Widget>[
                       Align(
                           alignment: Alignment.topRight,
-                          child: GestureDetector(
-                            onTap: () {},
-                            child: Icon(
-                              Icons.camera_alt,
-                              size: 25,
-                            ),
+                          child: Icon(
+                            Icons.camera_alt,
+                            size: 25,
                           )),
                       CircleAvatar(
                         radius: 128,
-                        backgroundImage: visitorData.getVisitor.imageUrl != null
-                            ? NetworkImage(visitorData.getVisitor.imageUrl)
+                        backgroundImage: employeeData.getEmployee.imageUrl !=
+                                null
+                            ? NetworkImage(employeeData.getEmployee.imageUrl)
                             : AssetImage('assets/images/blank_pic.jpg'),
                       ),
                     ],
@@ -187,138 +232,78 @@ class _EditProfileFormState extends State<EditProfileForm> {
                 ),
               ),
             ),
-            TextFormField(
-              obscureText: false,
-              style: loginTextFieldsStyles,
-              //controller: _nameController,
-              initialValue:
-                  '${visitorData.getVisitor.firstName} ${visitorData.getVisitor.lastName}',
-              validator: (value) {
-                if (value.isEmpty) {
-                  return "Please Enter Text";
-                }
-                return null;
-              },
-              decoration: InputDecoration(
-                fillColor: Colors.grey[300],
-                prefixIcon: Icon(
-                  Icons.person,
-                  color: Colors.black,
+            Row(
+              children: [
+                Expanded(
+                  child: TextFormField(
+                    obscureText: false,
+                    style: loginTextFieldsStyles,
+                    //controller: _firstNameControlller,
+                    initialValue: '${employeeData.getEmployee.firstName}',
+                    validator: (value) {
+                      if (value.isEmpty) {
+                        return "Please Enter Text";
+                      }
+                      return null;
+                    },
+                    onChanged: (value) {
+                      _firstName = value;
+                    },
+                    decoration: InputDecoration(
+                      fillColor: Colors.grey[300],
+                      prefixIcon: Icon(
+                        Icons.person,
+                        color: Colors.black,
+                      ),
+                      contentPadding:
+                          EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
+                      // hintText: 'Name',
+                      hintStyle: TextStyle(color: Colors.black, fontSize: 15),
+                      border: InputBorder.none,
+                    ),
+                  ),
                 ),
-                contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-                hintText: 'Name',
-                hintStyle: TextStyle(color: Colors.black, fontSize: 15),
-                border: InputBorder.none,
-              ),
-            ),
-            SizedBox(
-              height: 8,
-            ),
-            TextFormField(
-              obscureText: false,
-              style: loginTextFieldsStyles,
-              //controller: _userNameController,
-              initialValue: visitorData.getVisitor.username,
-              validator: (value) {
-                if (value.isEmpty) {
-                  return "Please Enter Text";
-                }
-                return null;
-              },
-              decoration: InputDecoration(
-                prefixIcon: Icon(
-                  Icons.person,
-                  color: Colors.black,
+                SizedBox(
+                  width: 8,
                 ),
-                contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-                hintText: 'User Name',
-                hintStyle: TextStyle(color: Colors.black, fontSize: 15),
-                border: InputBorder.none,
-              ),
-            ),
-            SizedBox(
-              height: 8,
-            ),
-            TextFormField(
-              obscureText: false,
-              style: loginTextFieldsStyles,
-              initialValue: visitorData.getVisitor.email,
-              //controller: _emailController,
-              keyboardType: TextInputType.emailAddress,
-              validator: (value) {
-                if (value.isEmpty) {
-                  return "Please Enter Email";
-                }
-                return null;
-              },
-              decoration: InputDecoration(
-                prefixIcon: Icon(
-                  Icons.email,
-                  color: Colors.black,
+                Expanded(
+                  child: TextFormField(
+                    obscureText: false,
+                    style: loginTextFieldsStyles,
+                    //controller: _lastNameControlller,
+                    initialValue: '${employeeData.getEmployee.lastName}',
+                    onChanged: (value) {
+                      _lastName = value;
+                    },
+                    validator: (value) {
+                      if (value.isEmpty) {
+                        return "Please Enter Text";
+                      }
+                      return null;
+                    },
+                    decoration: InputDecoration(
+                      fillColor: Colors.grey[300],
+                      prefixIcon: Icon(
+                        Icons.person,
+                        color: Colors.black,
+                      ),
+                      contentPadding:
+                          EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
+                      //hintText: 'Name',
+                      hintStyle: TextStyle(color: Colors.black, fontSize: 15),
+                      border: InputBorder.none,
+                    ),
+                  ),
                 ),
-                contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-                hintText: 'Enter Email',
-                hintStyle: TextStyle(color: Colors.black, fontSize: 15),
-                border: InputBorder.none,
-              ),
-            ),
-            SizedBox(
-              height: 8,
-            ),
-            TextFormField(
-              obscureText: false,
-              style: loginTextFieldsStyles,
-              //controller: _phoneNoController,
-              initialValue: DateFormat.yMMMMd('en_US')
-                  .format(visitorData.getVisitor.dateOfBirth),
-              validator: (value) {
-                if (value.isEmpty) {
-                  return "Please Enter Text";
-                }
-                return null;
-              },
-              decoration: InputDecoration(
-                prefixIcon: Icon(
-                  Icons.calendar_today,
-                  color: Colors.black,
-                ),
-                contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-                hintText: '',
-                hintStyle: TextStyle(color: Colors.black, fontSize: 15),
-                border: InputBorder.none,
-              ),
-            ),
-            SizedBox(
-              height: 8,
-            ),
-            TextFormField(
-              obscureText: false,
-              style: loginTextFieldsStyles,
-              // initialValue: visitorData.getVisitor.,
-              //controller: _emailController,
-              validator: (value) {
-                if (value.isEmpty) {
-                  return "Please Enter Text";
-                }
-                return null;
-              },
-              decoration: InputDecoration(
-                fillColor: Colors.grey[100],
-                prefixIcon: Icon(
-                  Icons.phone,
-                  color: Colors.black,
-                ),
-                contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-                hintText: '+923331234567',
-                hintStyle: TextStyle(color: Colors.black, fontSize: 15),
-                border: InputBorder.none,
-              ),
+              ],
             ),
             SizedBox(
               height: 8,
             ),
             GestureDetector(
-              onTap: () {},
+              onTap: () {
+                updateProfile(context);
+              },
               child: Container(
                 width: MediaQuery.of(context).size.width * 0.7,
                 height: 40,
@@ -339,5 +324,43 @@ class _EditProfileFormState extends State<EditProfileForm> {
         ),
       ),
     );
+  }
+
+  void updateProfile(BuildContext context) async {
+    final employeeData = Provider.of<EmployeesProvider>(context, listen: false);
+
+    await uploadFile();
+    final url = Uri.parse(
+        'https://pure-woodland-42301.herokuapp.com/api/employee/updateProfile');
+
+    final response = await http.put(
+      url,
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode(<String, String>{
+        'id': employeeData.getEmployee.id,
+        'firstName': _firstName == null
+            ? employeeData.getEmployee.firstName
+            : _firstName,
+        'lastName':
+            _lastName == null ? employeeData.getEmployee.lastName : _lastName,
+        'avatar':
+            _imageUrl == null ? employeeData.getEmployee.imageUrl : _imageUrl,
+      }),
+    );
+    print('code=${response.statusCode}');
+    if (response.statusCode == 200) {
+      employeeData.getEmployeeDataById(employeeData.getEmployee.id);
+      Fluttertoast.showToast(
+          msg: "Data Updated Successfully",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.black54,
+          textColor: Colors.white,
+          fontSize: 16.0);
+      Navigator.pushNamed(context, EmployeeHomeScreen.id);
+    }
   }
 }

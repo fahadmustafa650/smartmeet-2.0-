@@ -20,8 +20,8 @@ class _ShowQrCodeScreenState extends State<ShowQrCodeScreen> {
   var _isInit = false;
 
   void getQrcode() async {
-    //String appointmentId = widget.appointmentId;
-    String appointmentId = '61292ccba64b18000460842a';
+    String appointmentId = widget.appointmentId;
+    //String appointmentId = '61292ccba64b18000460842a';
     final url = Uri.parse(
         'https://pure-woodland-42301.herokuapp.com/api/visitor/acceptedrequest/qrcode/$appointmentId');
     final response = await http.get(url);

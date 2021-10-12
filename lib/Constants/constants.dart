@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 const mapApiKey = "AIzaSyAofr6MTAVjER_EanHr_GFsMGzOcehOeUU";
 const darkBlueColor = Colors.blue;
@@ -28,4 +29,14 @@ final otpInputDecoration = InputDecoration(
   border: InputBorder.none,
   focusedBorder: InputBorder.none,
   enabledBorder: InputBorder.none,
+);
+//Loading Spinner
+const threeBounceSpinkit = SpinKitThreeBounce(
+  color: Colors.white,
+  size: 25.0,
+);
+
+const border = OutlineInputBorder(
+  borderSide: BorderSide(color: Colors.grey, width: 1.0),
+  borderRadius: BorderRadius.all(Radius.circular(20.0)),
 );

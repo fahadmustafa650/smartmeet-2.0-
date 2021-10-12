@@ -1,18 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smart_meet/Constants/constants.dart';
+import 'package:smart_meet/Employee/employee_screens/emp_sign_in_screen.dart';
 import 'package:smart_meet/Employee/employee_screens/employee_pending_appointments_screen.dart';
-import 'package:smart_meet/Visitor/Appointment/visitor_pending_appointments_screen.dart';
-import 'package:smart_meet/Visitor/Appointment/search_employee_screen.dart';
-import 'package:smart_meet/Visitor/Visitor%20Authentication/visitor_sign_in_screen.dart';
+import 'package:smart_meet/models/employee_model.dart';
 import 'package:smart_meet/providers/employee_provider.dart';
-import 'package:smart_meet/providers/visitor_provider.dart';
 import 'package:smart_meet/screens/chat_screen.dart';
 import 'package:smart_meet/screens/login_as_screen.dart';
 import 'package:smart_meet/widgets/info_panel.dart';
-//import 'package:smart_meet/Employee/employee_screen/employee_booked_appointment.dart';
 import 'package:smart_meet/Employee/employee_screens/employee_booked_appointment.dart';
 
 import 'employee_edit_profile_screen.dart';
@@ -36,9 +34,10 @@ class _EmployeeHomeScreenState extends State<EmployeeHomeScreen> {
   @override
   void didChangeDependencies() async {
     super.didChangeDependencies();
+    print(
+        'isInit=$_isInit id=${Provider.of<EmployeesProvider>(context).getEmployee.id}');
     if (_isInit &&
         Provider.of<EmployeesProvider>(context).getEmployee.id == null) {
-      //await Provider.of<Visitors>(context).getVisitorData(args['email']);
       setState(() {
         _isLoading = true;
       });
@@ -201,13 +200,18 @@ class _EmployeeHomeScreenState extends State<EmployeeHomeScreen> {
           ),
           GestureDetector(
             onTap: () {
+              logOut(context);
               // Navigator.push(context,
               //     MaterialPageRoute(builder: (context) => MXPSchoolPickup()));
-              clearLoginData();
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => VisitorSignInScreen()));
+              //clearLoginData();
+              // Navigator.push(
+              //   context,
+              //   MaterialPageRoute(
+              //     builder: (context) => EmployeeSignInScreen(
+              //       isLoggedIn: false,
+              //     ),
+              //   ),
+              // );
             },
             child: InfoPanel(
               title: 'Logout',
@@ -218,6 +222,33 @@ class _EmployeeHomeScreenState extends State<EmployeeHomeScreen> {
         ],
       ),
     );
+  }
+
+  void logOut(BuildContext context) {
+    final employeeData = Provider.of<EmployeesProvider>(context, listen: false);
+    print('logout');
+    employeeData.destroyEmployee();
+    print('empId=${employeeData.getEmployee.id}');
+    if (employeeData.getEmployee.id == null) {
+      Fluttertoast.showToast(
+        msg: "Logout Successfully",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.black45,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+      //print('loggedouttt');
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => EmployeeSignInScreen(
+            isLoggedIn: false,
+          ),
+        ),
+      );
+    }
   }
 
   void clearLoginData() async {

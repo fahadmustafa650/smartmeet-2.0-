@@ -55,7 +55,7 @@ class _EditProfileFormState extends State<EditProfileForm> {
     final isValid = _formKey.currentState.validate();
     if (isValid) {
       //TODO: Enter Backend code to submit form
-
+      print('valid');
     }
   }
 
@@ -268,29 +268,30 @@ class _EditProfileFormState extends State<EditProfileForm> {
             SizedBox(
               height: 8,
             ),
-            TextFormField(
-              obscureText: false,
-              style: loginTextFieldsStyles,
-              //controller: _phoneNoController,
-              initialValue: DateFormat.yMMMMd('en_US')
-                  .format(employeeData.getEmployee.dateOfBirth),
-              validator: (value) {
-                if (value.isEmpty) {
-                  return "Please Enter Text";
-                }
-                return null;
-              },
-              decoration: InputDecoration(
-                prefixIcon: Icon(
-                  Icons.calendar_today,
-                  color: Colors.black,
-                ),
-                contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-                hintText: '',
-                hintStyle: TextStyle(color: Colors.black, fontSize: 15),
-                border: InputBorder.none,
-              ),
-            ),
+            // TextFormField(
+            //   obscureText: false,
+            //   style: loginTextFieldsStyles,
+            //   //controller: _phoneNoController,
+            //   initialValue: DateFormat.yMMMMd('en_US')
+            //       .format(employeeData.getEmployee.dateOfBirth)
+            //       .toString(),
+            //   validator: (value) {
+            //     if (value.isEmpty) {
+            //       return "Please Enter Text";
+            //     }
+            //     return null;
+            //   },
+            //   decoration: InputDecoration(
+            //     prefixIcon: Icon(
+            //       Icons.calendar_today,
+            //       color: Colors.black,
+            //     ),
+            //     contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
+            //     hintText: '',
+            //     hintStyle: TextStyle(color: Colors.black, fontSize: 15),
+            //     border: InputBorder.none,
+            //   ),
+            // ),
             SizedBox(
               height: 8,
             ),

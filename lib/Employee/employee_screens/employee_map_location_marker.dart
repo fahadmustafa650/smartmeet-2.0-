@@ -7,15 +7,17 @@ import 'package:smart_meet/Constants/constants.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:smart_meet/models/direction_repository.dart';
 import 'package:smart_meet/models/directions.dart';
+//import 'package:geocoder/geocoder.dart';
 
 const mapApiKey = 'AIzaSyAofr6MTAVjER_EanHr_GFsMGzOcehOeUU';
 
-class MapScreen extends StatefulWidget {
+class EmployeeMapLocationMarker extends StatefulWidget {
   @override
-  _MapScreenState createState() => _MapScreenState();
+  _EmployeeMapLocationMarkerState createState() =>
+      _EmployeeMapLocationMarkerState();
 }
 
-class _MapScreenState extends State<MapScreen> {
+class _EmployeeMapLocationMarkerState extends State<EmployeeMapLocationMarker> {
   static const _initialCameraPosition = CameraPosition(
     target: LatLng(37.773972, -122.431297),
     zoom: 11.5,
@@ -23,7 +25,7 @@ class _MapScreenState extends State<MapScreen> {
 
   GoogleMapController _googleMapController;
   //Marker _origin;
-  Marker _destination;
+  Marker _officeLocation;
   Directions _info;
   Position currentPosition;
   var geolocator = Geolocator();
@@ -58,51 +60,34 @@ class _MapScreenState extends State<MapScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        centerTitle: false,
-        title: const Text('Google Maps'),
+        centerTitle: true,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {},
+        ),
+        title: const Text('Choose Office Location'),
         actions: [
-          // if (_origin != null)
-          //   TextButton(
-          //     onPressed: () => _googleMapController.animateCamera(
-          //       CameraUpdate.newCameraPosition(
-          //         CameraPosition(
-          //           target: _origin.position,
-          //           zoom: 14.5,
-          //           tilt: 50.0,
-          //         ),
-          //       ),
-          //     ),
-          //     style: TextButton.styleFrom(
-          //       primary: Colors.green,
-          //       textStyle: const TextStyle(fontWeight: FontWeight.w600),
-          //     ),
-          //     child: const Text(
-          //       'ORIGIN',
-          //       style: TextStyle(
-          //         color: Colors.white,
-          //       ),
-          //     ),
-          //   ),
-          // if (_destination != null)
-          //   TextButton(
-          //     onPressed: () => _googleMapController.animateCamera(
-          //       CameraUpdate.newCameraPosition(
-          //         CameraPosition(
-          //           target: _destination.position,
-          //           zoom: 14.5,
-          //           tilt: 50.0,
-          //         ),
-          //       ),
-          //     ),
-          //     style: TextButton.styleFrom(
-          //       primary: Colors.blue,
-          //       textStyle: const TextStyle(fontWeight: FontWeight.w600),
-          //     ),
-          //     child: const Text('DEST',
-          //         style: const TextStyle(
-          //           color: Colors.white,
-          //         )),
-          //   )
+          if (_officeLocation != null)
+            TextButton(
+              onPressed: () => _googleMapController.animateCamera(
+                CameraUpdate.newCameraPosition(
+                  CameraPosition(
+                    target: _officeLocation.position,
+                    zoom: 14.5,
+                    tilt: 50.0,
+                  ),
+                ),
+              ),
+              style: TextButton.styleFrom(
+                primary: Colors.blue,
+                textStyle: const TextStyle(fontWeight: FontWeight.w600),
+              ),
+              child: const Text('Save',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 25,
+                  )),
+            )
         ],
       ),
       body: Stack(
@@ -120,7 +105,7 @@ class _MapScreenState extends State<MapScreen> {
             },
             markers: {
               //if (_origin != null) _origin,
-              if (_destination != null) _destination,
+              if (_officeLocation != null) _officeLocation,
             },
             polylines: {
               if (_info != null)
@@ -179,28 +164,8 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   void _addMarker(LatLng pos) async {
-    // if (_origin == null || (_origin != null && _destination != null)) {
-    //   // Origin is not set OR Origin/Destination are both set
-    //   // Set origin
-    //   setState(() {
-    //     _origin = Marker(
-    //       markerId: const MarkerId('origin'),
-    //       infoWindow: const InfoWindow(title: 'Origin'),
-    //       icon:
-    //           BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
-    //       position: pos,
-    //     );
-    //     // Reset destination
-    //     _destination = null;
-
-    //     // Reset info
-    //     _info = null;
-    //   });
-    // } else {
-    // Origin is already set
-    // Set destination
     setState(() {
-      _destination = Marker(
+      _officeLocation = Marker(
         markerId: const MarkerId('destination'),
         infoWindow: const InfoWindow(title: 'Destination'),
         icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),

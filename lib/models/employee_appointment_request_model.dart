@@ -1,7 +1,7 @@
-class AppointmentRequestData {
+class EmployeeAppointmentRequestData {
   final String id;
   final String visitorName;
-  AppointmentRequestData({
+  EmployeeAppointmentRequestData({
     this.id,
     this.visitorName,
   });

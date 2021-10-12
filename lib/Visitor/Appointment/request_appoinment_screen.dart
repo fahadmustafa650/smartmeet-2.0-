@@ -75,8 +75,9 @@ class _RequestAppointmentScreenState extends State<RequestAppointmentScreen> {
         'Date': selectedDate.toString(),
       }),
     );
-    print(jsonDecode(response.body)['error']);
+    //print(jsonDecode(response.body)['error']);
     if (response.statusCode == 200) {
+      print('appointmentSent=${response.statusCode}');
       Navigator.pushNamed(context, AppointmentSentScreen.id);
     }
   }
@@ -129,7 +130,7 @@ class _RequestAppointmentScreenState extends State<RequestAppointmentScreen> {
     if (_selectedTime24Hour != null) {
       setState(() {
         selectedEndTime =
-            '${_selectedTime24Hour.hour}:${_selectedTime24Hour.minute}';
+            '${_selectedTime24Hour.hour}-${_selectedTime24Hour.minute}';
         print('selectedEndTime=$selectedEndTime');
       });
     }
@@ -179,6 +180,13 @@ class _RequestAppointmentScreenState extends State<RequestAppointmentScreen> {
                       contentPadding: EdgeInsets.only(left: 10),
                       border: InputBorder.none,
                       enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(25.0),
+                        borderSide: BorderSide(
+                          color: Colors.grey,
+                          width: 1.0,
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(25.0),
                         borderSide: BorderSide(
                           color: Colors.grey,

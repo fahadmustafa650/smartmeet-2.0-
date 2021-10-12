@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:smart_meet/models/appointment.dart';
-import 'package:smart_meet/models/appointment_request_model.dart';
+import 'package:smart_meet/models/visitor_appointment_request_model.dart';
 import 'package:smart_meet/widgets/appointment_request.dart';
 
 class AppointmentRequestsScreen extends StatefulWidget {

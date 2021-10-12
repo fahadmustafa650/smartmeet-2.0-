@@ -8,6 +8,7 @@ import 'package:smart_meet/models/sent_appointment_model.dart';
 import 'package:smart_meet/providers/visitor_booked_appointments_providers.dart';
 import 'package:http/http.dart' as http;
 import 'package:smart_meet/providers/visitor_provider.dart';
+import 'package:smart_meet/screens/qr_code_screen.dart';
 
 class BookedAppointmentsScreen extends StatefulWidget {
   static final id = '/visitor_booked_appointment_result';
@@ -31,7 +32,7 @@ class _BookedAppointmentsScreenState extends State<BookedAppointmentsScreen> {
       return;
     }
     try {
-      await Provider.of<AcceptedAppointmentRequestsProvider>(context,
+      await Provider.of<VisitorAcceptedAppointmentRequestsProvider>(context,
               listen: false)
           .acceptedAppointmentRequestsList(visitorId)
           .then((_) {
@@ -62,7 +63,8 @@ class _BookedAppointmentsScreenState extends State<BookedAppointmentsScreen> {
   @override
   Widget build(BuildContext context) {
     List<SentAppointment> _appointmentPendingRequests =
-        Provider.of<AcceptedAppointmentRequestsProvider>(context, listen: false)
+        Provider.of<VisitorAcceptedAppointmentRequestsProvider>(context,
+                listen: false)
             .getSentAppointmentRequests;
     // final screenWidth = MediaQuery.of(context).size.width;
     // final screenHeight = MediaQuery.of(context).size.height;
@@ -79,23 +81,31 @@ class _BookedAppointmentsScreenState extends State<BookedAppointmentsScreen> {
       ),
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
-          : ListView.builder(
-              itemCount: _appointmentPendingRequests.length,
-              itemBuilder: (ctx, index) {
-                return EmployeeBookedInfo(
-                  employeeId: _appointmentPendingRequests[index].employeeId,
-                  date: DateTime.parse(
-                      _appointmentPendingRequests[index].date.toString()),
-                  timeSlot: _appointmentPendingRequests[index].timeSlot,
-                );
-              },
-            ),
+          : _appointmentPendingRequests.length == 0
+              ? Center(
+                  child: Text(
+                    'No Booked Appointment',
+                    style: TextStyle(color: Colors.black, fontSize: 18),
+                  ),
+                )
+              : ListView.builder(
+                  itemCount: _appointmentPendingRequests.length,
+                  itemBuilder: (ctx, index) {
+                    return EmployeeBookedInfo(
+                      employeeId: _appointmentPendingRequests[index].employeeId,
+                      date: DateTime.parse(
+                          _appointmentPendingRequests[index].date.toString()),
+                      timeSlot: _appointmentPendingRequests[index].timeSlot,
+                    );
+                  },
+                ),
     );
   }
 }
 
 class EmployeeBookedInfo extends StatefulWidget {
   final String employeeId;
+  final String appointmentId;
   final DateTime date;
   final String timeSlot;
 
@@ -103,6 +113,7 @@ class EmployeeBookedInfo extends StatefulWidget {
     @required this.employeeId,
     @required this.date,
     @required this.timeSlot,
+    @required this.appointmentId,
   });
 
   @override
@@ -201,8 +212,13 @@ class _EmployeeBookedInfoState extends State<EmployeeBookedInfo> {
                       ),
                       GestureDetector(
                         onTap: () {
-                          Navigator.pushNamed(
-                              context, BookedAppointmentQRCode.id);
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => ShowQrCodeScreen(
+                                      appointmentId: widget.appointmentId,
+                                    )),
+                          );
                         },
                         child: Container(
                           width: screenWidth * 0.45,

@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:smart_meet/Visitor/Appointment/pending_appointments_screen.dart';
+import 'package:smart_meet/Constants/constants.dart';
+import 'package:smart_meet/Visitor/Appointment/visitor_pending_appointments_screen.dart';
 import 'package:smart_meet/Visitor/Appointment/search_employee_screen.dart';
 import 'package:smart_meet/Visitor/Visitor%20Authentication/visitor_sign_in_screen.dart';
+import 'package:smart_meet/models/visitor_model.dart';
 import 'package:smart_meet/providers/visitor_provider.dart';
 import 'package:smart_meet/screens/chat_screen.dart';
 import 'package:smart_meet/screens/edit_profile_screen.dart';
+import 'package:smart_meet/screens/login_as_screen.dart';
 import 'package:smart_meet/widgets/info_panel.dart';
 import 'Appointment/visitor_booked_appointment_screen.dart';
-import 'Visitor Verification Steps/booked_appointment_qrcode.dart';
+import 'Visitor Authentication/visitor_edit_profile_screen.dart';
 
 class VisitorHomeScreen extends StatefulWidget {
   static final id = '/visitor_home_screen';
@@ -22,16 +26,20 @@ class VisitorHomeScreen extends StatefulWidget {
 class _VisitorHomeScreenState extends State<VisitorHomeScreen> {
   bool _isInit;
   bool _isLoading = false;
+
   @override
   void initState() {
     super.initState();
+    //successMessage();
+
     _isInit = true;
   }
 
   @override
   void didChangeDependencies() async {
     super.didChangeDependencies();
-    if (_isInit) {
+    if (_isInit &&
+        Provider.of<VisitorProvider>(context).getVisitor.id == null) {
       //await Provider.of<Visitors>(context).getVisitorData(args['email']);
       setState(() {
         _isLoading = true;
@@ -49,7 +57,8 @@ class _VisitorHomeScreenState extends State<VisitorHomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final visitorData = Provider.of<VisitorProvider>(context).getVisitor;
+    final visitorData =
+        Provider.of<VisitorProvider>(context, listen: true).getVisitor;
     final screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       backgroundColor: Color(0XFFFFFFFF),
@@ -60,15 +69,15 @@ class _VisitorHomeScreenState extends State<VisitorHomeScreen> {
                 children: <Widget>[
                   UserAccountsDrawerHeader(
                     accountEmail: visitorData.email == null
-                        ? CircularProgressIndicator()
+                        ? threeBounceSpinkit
                         : Text(visitorData.email),
-                    accountName: visitorData.firstName == null ||
-                            visitorData.lastName == null
-                        ? CircularProgressIndicator()
+                    accountName: (visitorData.firstName == null ||
+                            visitorData.lastName == null)
+                        ? threeBounceSpinkit
                         : Text(
                             '${visitorData.firstName} ${visitorData.lastName}'),
                     currentAccountPicture: _isLoading
-                        ? CircularProgressIndicator()
+                        ? threeBounceSpinkit
                         : CircleAvatar(
                             radius: 100,
                             backgroundImage: _isLoading
@@ -80,7 +89,7 @@ class _VisitorHomeScreenState extends State<VisitorHomeScreen> {
                     leading: Icon(Icons.person),
                     title: Text("Edit Profile"),
                     onTap: () {
-                      Navigator.pushNamed(context, EditProfileScreen.id);
+                      Navigator.pushNamed(context, VisitorEditProfileScreen.id);
                     },
                   ),
                   ListTile(
@@ -88,7 +97,7 @@ class _VisitorHomeScreenState extends State<VisitorHomeScreen> {
                     title: Text("Book Appointment"),
                     onTap: () {
                       // print("Categories Clicked");
-                      Navigator.pushNamed(context, BookedAppointmentsScreen.id);
+                      Navigator.pushNamed(context, EmployeeSearchBar.id);
                     },
                   ),
                   ListTile(
@@ -110,7 +119,9 @@ class _VisitorHomeScreenState extends State<VisitorHomeScreen> {
                       Icons.logout,
                     ),
                     title: Text("Logout"),
-                    onTap: () {},
+                    onTap: () {
+                      logOut(context);
+                    },
                   ),
                 ],
               ),
@@ -119,9 +130,7 @@ class _VisitorHomeScreenState extends State<VisitorHomeScreen> {
       appBar: AppBar(
         backgroundColor: Colors.lightBlue,
         title: _isLoading
-            ? CircularProgressIndicator(
-                backgroundColor: Colors.white,
-              )
+            ? threeBounceSpinkit
             : Text(
                 ('${visitorData.firstName} ${visitorData.lastName}'),
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
@@ -176,7 +185,7 @@ class _VisitorHomeScreenState extends State<VisitorHomeScreen> {
           ),
           GestureDetector(
             onTap: () {
-              Navigator.pushNamed(context, EditProfileScreen.id);
+              Navigator.pushNamed(context, VisitorEditProfileScreen.id);
             },
             child: InfoPanel(
               title: 'Edit Profile',
@@ -187,19 +196,18 @@ class _VisitorHomeScreenState extends State<VisitorHomeScreen> {
           GestureDetector(
             onTap: () {},
             child: InfoPanel(
-                title: 'Reports',
-                textIconColor: Colors.black,
-                iconData: Icons.report),
+              title: 'Reports',
+              textIconColor: Colors.black,
+              iconData: Icons.report,
+            ),
           ),
           GestureDetector(
             onTap: () {
-              // Navigator.push(context,
-              //     MaterialPageRoute(builder: (context) => MXPSchoolPickup()));
-              clearLoginData();
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => VisitorSignInScreen()));
+              print('logout');
+              logOut(context);
+              //clearLoginData();
+              //Navigator.push(context, );
+              // Navigator.pushNamed(context, VisitorSignInScreen.id);
             },
             child: InfoPanel(
               title: 'Logout',
@@ -210,6 +218,30 @@ class _VisitorHomeScreenState extends State<VisitorHomeScreen> {
         ],
       ),
     );
+  }
+
+  void logOut(BuildContext context) {
+    final visitorData = Provider.of<VisitorProvider>(context, listen: false);
+    visitorData.destroyVisitor();
+    if (visitorData.getVisitor.id == null) {
+      Fluttertoast.showToast(
+          msg: "Logout Successfully",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0);
+      //print('loggedouttt');
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => VisitorSignInScreen(
+            isLoggedIn: false,
+          ),
+        ),
+      );
+    }
   }
 
   void clearLoginData() async {

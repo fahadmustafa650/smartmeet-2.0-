@@ -2,21 +2,23 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:smart_meet/models/appointment.dart';
-import 'package:smart_meet/providers/appointments_provider.dart';
+import 'package:smart_meet/providers/employee_pending_appointments_provider.dart';
 import 'package:smart_meet/providers/visitor_provider.dart';
 import 'package:http/http.dart' as http;
 
-class AppointmentRequest extends StatefulWidget {
-  final PendingAppointment appointmentRequestData;
-  const AppointmentRequest({this.appointmentRequestData});
+class VisitorAppointmentRequest extends StatefulWidget {
+  final Appointment visitorAppointmentRequestData;
+  const VisitorAppointmentRequest({this.visitorAppointmentRequestData});
 
   @override
-  _AppointmentRequestState createState() => _AppointmentRequestState();
+  _VisitorAppointmentRequestState createState() =>
+      _VisitorAppointmentRequestState();
 }
 
-class _AppointmentRequestState extends State<AppointmentRequest> {
+class _VisitorAppointmentRequestState extends State<VisitorAppointmentRequest> {
   bool _isLoading = true;
   var data;
   var name;
@@ -48,7 +50,7 @@ class _AppointmentRequestState extends State<AppointmentRequest> {
               // print('apId=${widget.appointmentRequestData.id}');
               Provider.of<EmployeePendingAppointmentsRequestsProvider>(context,
                       listen: false)
-                  .rejectAppointment(widget.appointmentRequestData.id);
+                  .rejectAppointment(widget.visitorAppointmentRequestData.id);
               Navigator.pop(context, 'Yes');
             },
             child: const Text('Yes'),
@@ -61,7 +63,7 @@ class _AppointmentRequestState extends State<AppointmentRequest> {
   Future<void> fetchData() async {
     try {
       // final id = Provider.of<EmployeesProvider>(context).getEmployee.id;
-      final visitorId = widget.appointmentRequestData.visitorId;
+      final visitorId = widget.visitorAppointmentRequestData.visitorId;
       //final visitorId = '';
       print('visitorId=$visitorId');
       if (visitorId == null) return;
@@ -91,16 +93,21 @@ class _AppointmentRequestState extends State<AppointmentRequest> {
     return _isLoading
         ? Center(child: CircularProgressIndicator())
         : Dismissible(
-            key: ValueKey(widget.appointmentRequestData.id),
+            key: ValueKey(widget.visitorAppointmentRequestData.id),
             onDismissed: (direction) async {
-              try {
-                Provider.of<EmployeePendingAppointmentsRequestsProvider>(
-                        context,
-                        listen: false)
-                    .rejectAppointment(widget.appointmentRequestData.id);
-              } catch (error) {}
+              print(direction.index);
+              if (DismissDirection.startToEnd == direction) {
+                acceptAppointment(context);
+              } else {
+                rejectAppointment(context);
+              }
             },
             background: Container(
+              color: Colors.green,
+              alignment: Alignment.centerLeft,
+              child: Icon(Icons.add, size: 40, color: Colors.white),
+            ),
+            secondaryBackground: Container(
               color: Theme.of(context).errorColor,
               alignment: Alignment.centerRight,
               child: Icon(Icons.delete, size: 40, color: Colors.white),
@@ -137,11 +144,13 @@ class _AppointmentRequestState extends State<AppointmentRequest> {
                       children: [
                         CustomIconTextWidget(
                           iconData: Icons.calendar_today,
-                          text: widget.appointmentRequestData.date.toString(),
+                          text: DateFormat.yMMMMd('en_US')
+                              .format(widget.visitorAppointmentRequestData.date)
+                              .toString(),
                         ),
                         CustomIconTextWidget(
                           iconData: Icons.timer,
-                          text: widget.appointmentRequestData.timeSlot,
+                          text: widget.visitorAppointmentRequestData.timeSlot,
                         ),
                       ],
                     ),
@@ -162,13 +171,30 @@ class _AppointmentRequestState extends State<AppointmentRequest> {
           );
   }
 
+  void rejectAppointment(BuildContext context) {
+    try {
+      Provider.of<EmployeePendingAppointmentsRequestsProvider>(context,
+              listen: false)
+          .rejectAppointment(widget.visitorAppointmentRequestData.id);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  void acceptAppointment(BuildContext context) async {
+    try {
+      Provider.of<EmployeePendingAppointmentsRequestsProvider>(context,
+              listen: false)
+          .acceptAppointment(widget.visitorAppointmentRequestData.id);
+    } catch (error) {
+      throw error;
+    }
+  }
+
   Widget acceptButton() {
     return GestureDetector(
       onTap: () {
-        final pendingRequest =
-            Provider.of<EmployeePendingAppointmentsRequestsProvider>(context,
-                    listen: false)
-                .acceptAppointment(widget.appointmentRequestData.id);
+        acceptAppointment(context);
       },
       child: Container(
         height: 35,

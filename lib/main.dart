@@ -6,6 +6,7 @@ import 'package:smart_meet/Employee/employee_screens/employee_home_screen.dart';
 import 'package:smart_meet/models/message_model.dart';
 import 'package:smart_meet/providers/visitor_provider.dart';
 import 'Employee/EmployeeForgetPassword/employee_enter_email_screen.dart';
+import 'Employee/EmployeeForgetPassword/employee_new_password_screen.dart';
 import 'Employee/employee_screens/appointment_requests_screen.dart';
 import 'Employee/employee_screens/emp_sign_in_screen.dart';
 import 'Employee/employee_screens/emp_sign_up_screen.dart';
@@ -26,6 +27,7 @@ import 'Visitor/Visitor Authentication/visitor_sign_in_screen.dart';
 import 'Visitor/Visitor Authentication/visitor_sign_up_screen.dart';
 import 'Visitor/Visitor Verification Steps/mask_detection_step4.dart';
 import 'Visitor/Visitor Verification Steps/qr_code_step1.dart';
+import 'Visitor/VisitorForgetPassword/visitor_enter_email_screen.dart';
 import 'Visitor/visitor_home_screen.dart';
 import 'providers/employee_booked_appointment_provider.dart';
 import 'providers/employee_pending_appointments_provider.dart';
@@ -37,7 +39,6 @@ import 'screens/chat_screen.dart';
 import 'screens/chating_screen.dart';
 import 'screens/contact_us.dart';
 import 'screens/edit_profile_screen.dart';
-import 'screens/enter_email_screen.dart';
 import 'screens/login_as_screen.dart';
 import 'Employee/employee_screens/employee_pending_appointments_screen.dart';
 import 'screens/map_screen.dart';
@@ -125,8 +126,8 @@ class MyApp extends StatelessWidget {
               EmployeeEditProfileScreen(),
           EmployeeBookedAppointmentsScreen.id: (context) =>
               EmployeeBookedAppointmentsScreen(),
-          // EmployeePendingAppointments.id: (context) =>
-          //     EmployeePendingAppointments(),
+          EmployeeNewPasswordScreen.id: (context) =>
+              EmployeeNewPasswordScreen(),
           VisitorEnterEmailScreen.id: (context) => VisitorEnterEmailScreen(),
           EmployeeEnterEmailScreen.id: (context) => EmployeeEnterEmailScreen(),
           FacialRecognitionStep3.id: (context) => FacialRecognitionStep3(),
@@ -144,6 +145,7 @@ class MyApp extends StatelessWidget {
               TemperatureDetectionStep3(),
           VisitorHomeScreen.id: (context) => VisitorHomeScreen(),
           VisitorEditProfileScreen.id: (context) => VisitorEditProfileScreen(),
+          VisitorEnterEmailScreen.id: (context) => VisitorEnterEmailScreen(),
           VisitorSignInScreen.id: (context) => VisitorSignInScreen(),
           VisitorSignUpScreen.id: (context) => VisitorSignUpScreen(),
           VisitorPendingAppointmentsScreen.id: (context) =>

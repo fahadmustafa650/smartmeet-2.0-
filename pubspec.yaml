@@ -24,12 +24,21 @@ dependencies:
   path_provider: ^2.0.2
   permission_handler:
   dio: ^4.0.0
+  google_maps_flutter: ^2.0.3
   intl_phone_number_input: ^0.7.0+2
   shared_preferences: ^2.0.7
   intl: ^0.17.0
-  firebase_storage: 
-  firebase_core: 
+  firebase_storage:
+  firebase_core:
   date_time_picker: "^2.1.0"
+  firebase_ml_vision: ^0.9.6+2
+  flutter_polyline_points: ^1.0.0
+  google_maps_place_picker:
+  place_picker: ^0.9.18
+  firebase_messaging: ^10.0.7
+  flutter_local_notifications:
+  flutter_spinkit: ^5.1.0
+  string_extensions: 
 
 
 
@@ -49,12 +58,6 @@ flutter:
   assets:
     - assets/images/
 
-
-  # To add custom fonts to your application, add a fonts section here,
-  # in this "flutter" section. Each entry in this list should have a
-  # "family" key with the font family name, and a "fonts" key with a
-  # list giving the asset and other descriptors for the font. For
-  # example:
   # fonts:
   #   - family: Schyler
   #     fonts:
@@ -66,6 +69,4 @@ flutter:
   #       - asset: fonts/TrajanPro.ttf
   #       - asset: fonts/TrajanPro_Bold.ttf
   #         weight: 700
-  #
-  # For details regarding fonts from package dependencies,
-  # see https://flutter.dev/custom-fonts/#from-packages
+  

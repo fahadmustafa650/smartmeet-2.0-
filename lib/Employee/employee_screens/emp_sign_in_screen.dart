@@ -6,9 +6,10 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smart_meet/Constants/constants.dart';
+import 'package:smart_meet/Employee/EmployeeForgetPassword/employee_enter_email_screen.dart';
+import 'package:smart_meet/Employee/EmployeeForgetPassword/employee_new_password_screen.dart';
 import 'package:smart_meet/Employee/employee_screens/emp_sign_up_screen.dart';
 import 'package:smart_meet/Employee/employee_screens/employee_home_screen.dart';
-import 'package:smart_meet/screens/enter_email_screen.dart';
 import 'package:smart_meet/widgets/login_with_fb.dart';
 import 'package:smart_meet/widgets/login_with_google.dart';
 
@@ -102,7 +103,7 @@ class _EmployeeSignInScreenState extends State<EmployeeSignInScreen> {
         );
       } else {
         if (jsonDecode(res)['error'] != null) {
-          _showSnackBar(jsonDecode(res)['error']);
+          _showSnackBar(jsonDecode(res));
           setState(() {
             _isLoading = false;
           });
@@ -261,7 +262,7 @@ class _EmployeeSignInScreenState extends State<EmployeeSignInScreen> {
       child: GestureDetector(
         onTap: () {
           //TODO: Forgot Passwoed button pressed
-          Navigator.pushNamed(context, VisitorEnterEmailScreen.id);
+          Navigator.pushNamed(context, EmployeeEnterEmailScreen.id);
         },
         child: Text(
           'Forget Password?',

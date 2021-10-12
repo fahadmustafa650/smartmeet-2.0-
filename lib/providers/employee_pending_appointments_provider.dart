@@ -5,9 +5,9 @@ import 'package:smart_meet/models/appointment.dart';
 import 'package:http/http.dart' as http;
 
 class EmployeePendingAppointmentsRequestsProvider with ChangeNotifier {
-  List<PendingAppointment> _pendingAppointmentRequests = [];
+  List<Appointment> _pendingAppointmentRequests = [];
 
-  List<PendingAppointment> get getPendingAppointmentRequests {
+  List<Appointment> get getPendingAppointmentRequests {
     return _pendingAppointmentRequests == null
         ? []
         : [..._pendingAppointmentRequests];
@@ -65,6 +65,7 @@ class EmployeePendingAppointmentsRequestsProvider with ChangeNotifier {
         // }
       } catch (error) {
         _pendingAppointmentRequests.insert(index, pendingAppointment);
+        notifyListeners();
         throw error;
       }
     }
@@ -75,20 +76,27 @@ class EmployeePendingAppointmentsRequestsProvider with ChangeNotifier {
         'https://pure-woodland-42301.herokuapp.com/api/employee/$id/pendingappointmentrequests');
     try {
       final response = await http.get(url);
-      //print(response.body);
-      final extractedData = await json.decode(response.body) as List<dynamic>;
-      print(extractedData);
-      //print('extractedData=$extractedData');
-      _pendingAppointmentRequests = [];
-      for (var data in extractedData) {
-        _pendingAppointmentRequests.add(PendingAppointment(
-          id: data['_id'].toString(),
-          visitorId: data['VisitorId'].toString(),
-          employeeId: data['employeeId'].toString(),
-          date: DateTime.parse(data['Date']),
-          timeSlot: data['Timeslot'].toString(),
-          message: data['Message'].toString(),
-        ));
+      // print(response.body);
+      // print(response.statusCode);
+      if (response.statusCode == 200) {
+        final extractedData = await json.decode(response.body) as List<dynamic>;
+        //print(extractedData);
+        //print('extractedData=$extractedData');
+        _pendingAppointmentRequests = [];
+        for (var data in extractedData) {
+          _pendingAppointmentRequests.add(
+            Appointment(
+              id: data['_id'].toString(),
+              visitorId: data['VisitorId'].toString(),
+              employeeId: data['employeeId'].toString(),
+              date: DateTime.parse(data['Date']),
+              timeSlot: data['Timeslot'].toString(),
+              message: data['Message'].toString(),
+            ),
+          );
+        }
+      } else if (response.statusCode == 399) {
+        _pendingAppointmentRequests = [];
       }
       notifyListeners();
     } catch (error) {

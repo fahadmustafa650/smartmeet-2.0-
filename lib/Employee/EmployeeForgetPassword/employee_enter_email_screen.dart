@@ -1,25 +1,24 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
+import 'package:smart_meet/Constants/constants.dart';
 import 'package:smart_meet/screens/otp_screen.dart';
 import 'package:http/http.dart' as http;
-import 'new_password_screen.dart';
-import 'package:http/http.dart';
 
-class VisitorEnterEmailScreen extends StatefulWidget {
-  static final id = '/enter_email_screen';
+import 'employee_new_password_screen.dart';
+
+class EmployeeEnterEmailScreen extends StatefulWidget {
+  static final id = '/employee_enter_email_screen';
 
   @override
-  _VisitorEnterEmailScreenState createState() =>
-      _VisitorEnterEmailScreenState();
+  _EmployeeEnterEmailScreenState createState() =>
+      _EmployeeEnterEmailScreenState();
 }
 
-class _VisitorEnterEmailScreenState extends State<VisitorEnterEmailScreen> {
+class _EmployeeEnterEmailScreenState extends State<EmployeeEnterEmailScreen> {
   final _emailController = TextEditingController();
-
+  bool _isLoading = false;
   void goToNewPasswordScreen() {
     Navigator.push(context, MaterialPageRoute(builder: (ctx) {
-      return NewPasswordScreen(
+      return EmployeeNewPasswordScreen(
         email: _emailController.text.toString(),
       );
     }));
@@ -94,25 +93,34 @@ class _VisitorEnterEmailScreenState extends State<VisitorEnterEmailScreen> {
             borderRadius: BorderRadius.circular(30),
             border: Border.all(color: Colors.white, width: 1.5),
             color: Colors.blue[700]),
-        child: Center(
-          child: Text(
-            'Send',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 20,
-            ),
-          ),
-        ),
+        child: _isLoading
+            ? threeBounceSpinkit
+            : Center(
+                child: Text(
+                  'Send',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                  ),
+                ),
+              ),
       ),
     );
   }
 
   Future<void> _isEmailExist() async {
     final url = Uri.parse(
-        'https://pure-woodland-42301.herokuapp.com/api/visitor/verifyemail/${_emailController.text.toString()}');
+        'https://pure-woodland-42301.herokuapp.com/api/employee/verifyemail/${_emailController.text.toString()}');
+    setState(() {
+      _isLoading = true;
+    });
     try {
       final response = await http.get(url);
+      print('isEmailExist=${response.statusCode}');
       if (response.statusCode == 200) {
+        setState(() {
+          _isLoading = false;
+        });
         Navigator.push(
           context,
           MaterialPageRoute(

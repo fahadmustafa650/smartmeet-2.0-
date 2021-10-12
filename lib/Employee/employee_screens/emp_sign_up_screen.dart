@@ -7,7 +7,9 @@ import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:intl/intl.dart';
 import 'package:smart_meet/Constants/constants.dart';
+import 'package:smart_meet/Employee/employee_screens/employee_home_screen.dart';
 import 'package:smart_meet/Visitor/Visitor%20Authentication/visitor_sign_in_screen.dart';
 import 'package:smart_meet/api/firebase_api.dart';
 import 'package:path/path.dart';
@@ -17,6 +19,8 @@ import 'package:smart_meet/widgets/login_with_google.dart';
 import 'package:http/http.dart' as http;
 import 'package:smart_meet/widgets/term_condition.dart';
 import 'package:string_validator/string_validator.dart';
+
+import 'emp_sign_in_screen.dart';
 
 class EmployeeSignUpScreen extends StatefulWidget {
   static final id = '/employee_sign_up';
@@ -61,11 +65,24 @@ class _EmployeeSignUpScreenState extends State<EmployeeSignUpScreen> {
     print('Download-Link: $urlDownload');
   }
 
+  void showMessage(String msg) {
+    Fluttertoast.showToast(
+      msg: msg,
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.CENTER,
+      timeInSecForIosWeb: 5,
+      backgroundColor: Colors.black45,
+      textColor: Colors.white,
+      fontSize: 16.0,
+    );
+  }
+
   Future<void> _addEmployeeData(BuildContext context) async {
     final url = Uri.parse(
         "https://pure-woodland-42301.herokuapp.com/api/employee/signup");
 
     try {
+      //print('uploadfile');
       await uploadFile();
       final response = await http.post(
         url,
@@ -80,17 +97,14 @@ class _EmployeeSignUpScreenState extends State<EmployeeSignUpScreen> {
           'avatar': imageUrl,
         }),
       );
+      print('responseStatus=${response.body}');
       if (response.statusCode == 200) {
-        Fluttertoast.showToast(
-          msg: "Sign Up Successfully",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.CENTER,
-          timeInSecForIosWeb: 5,
-          backgroundColor: Colors.black45,
-          textColor: Colors.white,
-          fontSize: 16.0,
-        );
-        Navigator.pushNamed(context, VisitorSignInScreen.id);
+        showMessage('Sign Up Successfully');
+        Navigator.pushNamed(context, EmployeeSignInScreen.id);
+      }
+      if (response.statusCode == 400) {
+        final msg = jsonDecode(response.body)['error'];
+        showMessage(msg.toString());
       }
       return response;
     } catch (error) {
@@ -184,6 +198,7 @@ class _EmployeeSignUpScreenState extends State<EmployeeSignUpScreen> {
   // Submit Data
   void _submitForm(BuildContext context) async {
     final _isValid = _formKey.currentState.validate();
+    print('employee sign up 1');
     if (_dateOfBirth == null) {
       setState(() {
         dateErrorMessage = 'Date Not Selected';
@@ -198,6 +213,7 @@ class _EmployeeSignUpScreenState extends State<EmployeeSignUpScreen> {
       return;
     }
     _formKey.currentState.save();
+    print('uploadfile');
     await _addEmployeeData(context);
     print('data added');
     // Navigator.push(
@@ -476,7 +492,8 @@ class _EmployeeSignUpScreenState extends State<EmployeeSignUpScreen> {
                                 leading: Text(
                                   _dateOfBirth == null
                                       ? 'Tap To Enter DOB'
-                                      : _dateOfBirth.toString(),
+                                      : DateFormat.yMMMMd('en_US')
+                                          .format(_dateOfBirth),
                                   style: TextStyle(
                                     color: Colors.grey,
                                     fontSize: 15,
@@ -674,21 +691,21 @@ class _EmployeeSignUpScreenState extends State<EmployeeSignUpScreen> {
                             SizedBox(
                               height: 13.0,
                             ),
-                            Text(
-                              'OR Continue with',
-                              style: TextStyle(
-                                  color: Colors.black87, fontSize: 18),
-                            ),
-                            SizedBox(
-                              height: 13.0,
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                LoginWithFbBtn(),
-                                LoginWithGoogleBtn(),
-                              ],
-                            ),
+                            // Text(
+                            //   'OR Continue with',
+                            //   style: TextStyle(
+                            //       color: Colors.black87, fontSize: 18),
+                            // ),
+                            // SizedBox(
+                            //   height: 13.0,
+                            // ),
+                            // Row(
+                            //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            //   children: [
+                            //     LoginWithFbBtn(),
+                            //     LoginWithGoogleBtn(),
+                            //   ],
+                            // ),
                             SizedBox(
                               height: 13.0,
                             ),
@@ -702,14 +719,18 @@ class _EmployeeSignUpScreenState extends State<EmployeeSignUpScreen> {
                             SizedBox(
                               height: 13.0,
                             ),
-                            Container(
-                              width: screenWidth * 0.4,
-                              height: screenHeight * 0.2,
-                              decoration: BoxDecoration(
-                                  border: Border.all(
-                                      width: 5, color: Colors.black)),
-                              child: Image(
-                                image: AssetImage('assets/images/ocr_logo.png'),
+                            GestureDetector(
+                              onTap: () {},
+                              child: Container(
+                                width: screenWidth * 0.4,
+                                height: screenHeight * 0.2,
+                                decoration: BoxDecoration(
+                                    border: Border.all(
+                                        width: 5, color: Colors.black)),
+                                child: Image(
+                                  image:
+                                      AssetImage('assets/images/ocr_logo.png'),
+                                ),
                               ),
                             ),
                             SizedBox(
@@ -746,7 +767,7 @@ class AlreadyAccount extends StatelessWidget {
           onTap: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => VisitorSignInScreen()),
+              MaterialPageRoute(builder: (context) => EmployeeSignInScreen()),
             );
           },
           child: Text(

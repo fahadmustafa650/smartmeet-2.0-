@@ -8,17 +8,17 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart';
 
-class ImageUpload extends StatefulWidget {
+class ImageUploadX extends StatefulWidget {
   @override
-  _ImageUploadState createState() => _ImageUploadState();
+  _ImageUploadXState createState() => _ImageUploadXState();
 }
 
-class _ImageUploadState extends State<ImageUpload> {
+class _ImageUploadXState extends State<ImageUploadX> {
   File _image;
   final picker = ImagePicker();
 
   Future<void> getImage() async {
-    final pickedFile = await picker.getImage(source: ImageSource.gallery);
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
     setState(() {
       if (pickedFile != null) {
@@ -37,7 +37,8 @@ class _ImageUploadState extends State<ImageUpload> {
     var length = await imageFile.length();
 
     // string to uri
-    var uri = Uri.parse("https://pure-woodland-42301.herokuapp.com/api/visitor/signup");
+    var uri = Uri.parse(
+        "https://pure-woodland-42301.herokuapp.com/api/visitor/signup");
 
     // create multipart request
     var request = http.MultipartRequest("POST", uri);

@@ -1,12 +1,12 @@
 import 'dart:convert';
 import 'dart:io' as io;
-import 'dart:typed_data';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:intl/intl.dart';
 import 'package:smart_meet/Constants/constants.dart';
 import 'package:smart_meet/Visitor/Visitor%20Authentication/visitor_sign_in_screen.dart';
 import 'package:smart_meet/api/firebase_api.dart';
@@ -41,8 +41,7 @@ class _VisitorSignUpScreenState extends State<VisitorSignUpScreen> {
   final _formKey = GlobalKey<FormState>();
   // File imgFile;
   io.File _image;
-
-  Future<void> uploadFile() async {
+  Future<void> _uploadFile() async {
     if (_image == null) return;
     final fileName = basename(_image.path);
     final destination = 'files/$fileName';
@@ -58,7 +57,7 @@ class _VisitorSignUpScreenState extends State<VisitorSignUpScreen> {
     final urlDownload = await snapshot.ref.getDownloadURL();
     imageUrl = urlDownload;
 
-    print('Download-Link: $urlDownload');
+    // print('Download-Link: $urlDownload');
   }
 
   Future<void> _addVisitorData(BuildContext context) async {
@@ -66,7 +65,7 @@ class _VisitorSignUpScreenState extends State<VisitorSignUpScreen> {
         "https://pure-woodland-42301.herokuapp.com/api/visitor/Visitorsignup");
 
     try {
-      await uploadFile();
+      await _uploadFile();
       final response = await http.post(
         url,
         headers: {'Content-Type': 'application/json'},
@@ -187,6 +186,10 @@ class _VisitorSignUpScreenState extends State<VisitorSignUpScreen> {
     if (_dateOfBirth == null) {
       setState(() {
         dateErrorMessage = 'Date Not Selected';
+      });
+    } else {
+      setState(() {
+        dateErrorMessage = '';
       });
     }
     if (_image == null || imageUrl == null) {
@@ -474,8 +477,9 @@ class _VisitorSignUpScreenState extends State<VisitorSignUpScreen> {
                                 tileColor: Colors.grey[100],
                                 leading: Text(
                                   _dateOfBirth == null
-                                      ? 'Tap To Enter DOB'
-                                      : _dateOfBirth.toString(),
+                                      ? 'Tap To Enter Date of Birth'
+                                      : DateFormat.yMMMMd('en_US')
+                                          .format(_dateOfBirth),
                                   style: TextStyle(
                                     color: Colors.grey,
                                     fontSize: 15,
@@ -571,62 +575,59 @@ class _VisitorSignUpScreenState extends State<VisitorSignUpScreen> {
                               ),
                             ),
                             SizedBox(height: 5.0),
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(30),
-                              child: TextFormField(
-                                obscureText: true,
-                                style: loginTextFieldsStyles,
-                                textInputAction: TextInputAction.next,
-                                keyboardType: TextInputType.visiblePassword,
-                                controller: _confirmPasswordController,
-                                onChanged: (value) {
-                                  if (value !=
-                                      _passwordController.text.toString()) {
-                                    setState(() {
-                                      errorPassword = "Password Doesn't Match";
-                                    });
-                                  }
-                                  if (value ==
-                                      _passwordController.text.toString()) {
-                                    setState(() {
-                                      errorPassword = "";
-                                    });
-                                  }
-                                },
-                                validator: (value) {
-                                  if (value.isEmpty) {
-                                    return "Please Enter Password";
-                                  } else if (value !=
-                                      _passwordController.text.toString()) {
-                                    return "Those passwords didn’t match. Try again.";
-                                  }
-                                  return null;
-                                },
-                                decoration: InputDecoration(
-                                  fillColor: Colors.grey[100],
-                                  filled: true,
-                                  //errorText: errorPassword,
-                                  errorStyle: TextStyle(
-                                      color: Colors.red, fontSize: 14),
-                                  border: InputBorder.none,
-                                  contentPadding: EdgeInsets.fromLTRB(
-                                    20.0,
-                                    15.0,
-                                    20.0,
-                                    15.0,
-                                  ),
-                                  labelText: 'Confirm Password',
-                                  labelStyle: TextStyle(
-                                    color: Colors.grey,
-                                    fontSize: 15,
-                                  ),
-                                  prefixIcon: Icon(
-                                    Icons.lock_outline,
-                                    color: Colors.grey,
-                                  ),
-                                  suffixIcon: Icon(
-                                    Icons.remove_red_eye,
-                                  ),
+                            TextFormField(
+                              obscureText: true,
+                              style: loginTextFieldsStyles,
+                              textInputAction: TextInputAction.next,
+                              keyboardType: TextInputType.visiblePassword,
+                              controller: _confirmPasswordController,
+                              onChanged: (value) {
+                                if (value !=
+                                    _passwordController.text.toString()) {
+                                  setState(() {
+                                    errorPassword = "Password Doesn't Match";
+                                  });
+                                }
+                                if (value ==
+                                    _passwordController.text.toString()) {
+                                  setState(() {
+                                    errorPassword = "";
+                                  });
+                                }
+                              },
+                              validator: (value) {
+                                if (value.isEmpty) {
+                                  return "Please Enter Password";
+                                } else if (value !=
+                                    _passwordController.text.toString()) {
+                                  return "Those passwords didn’t match. Try again!";
+                                }
+                                return null;
+                              },
+                              decoration: InputDecoration(
+                                fillColor: Colors.grey[100],
+                                filled: true,
+                                //errorText: errorPassword,
+                                errorStyle:
+                                    TextStyle(color: Colors.red, fontSize: 14),
+                                border: InputBorder.none,
+                                contentPadding: EdgeInsets.fromLTRB(
+                                  20.0,
+                                  15.0,
+                                  20.0,
+                                  15.0,
+                                ),
+                                labelText: 'Confirm Password',
+                                labelStyle: TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 15,
+                                ),
+                                prefixIcon: Icon(
+                                  Icons.lock_outline,
+                                  color: Colors.grey,
+                                ),
+                                suffixIcon: Icon(
+                                  Icons.remove_red_eye,
                                 ),
                               ),
                             ),

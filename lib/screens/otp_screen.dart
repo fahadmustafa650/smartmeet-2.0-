@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:email_auth/email_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:smart_meet/Constants/constants.dart';
@@ -44,6 +45,8 @@ class _OtpScreenState extends State<OtpScreen> {
   final circlePin4Controller = TextEditingController();
   final circlePin5Controller = TextEditingController();
   final circlePin6Controller = TextEditingController();
+  //Loading
+  bool _isLoading = false;
 
   void clearAll() {
     setState(() {
@@ -105,6 +108,34 @@ class _OtpScreenState extends State<OtpScreen> {
     }
   }
 
+  void resetCircleColor(FocusNode focusNode) {
+    if (focusNode == pin2FocusNode) {
+      setState(() {
+        circlePinColor1 = Colors.white;
+      });
+    } else if (focusNode == pin3FocusNode) {
+      setState(() {
+        circlePinColor2 = Colors.white;
+      });
+    } else if (focusNode == pin4FocusNode) {
+      setState(() {
+        circlePinColor3 = Colors.white;
+      });
+    } else if (focusNode == pin5FocusNode) {
+      setState(() {
+        circlePinColor4 = Colors.white;
+      });
+    } else if (focusNode == pin6FocusNode) {
+      setState(() {
+        circlePinColor5 = Colors.white;
+      });
+    } else {
+      setState(() {
+        circlePinColor6 = Colors.white;
+      });
+    }
+  }
+
   void nextField(String value, FocusNode focusNode) {
     if (value.length == 1) {
       setState(() {
@@ -120,7 +151,7 @@ class _OtpScreenState extends State<OtpScreen> {
   void sendOtpRequest() {
     try {
       EmailAuth.sessionName = 'Visitor Session1';
-      print(widget.email);
+
       EmailAuth.sendOtp(receiverMail: widget.email);
     } catch (error) {
       print(error);
@@ -130,19 +161,49 @@ class _OtpScreenState extends State<OtpScreen> {
   }
 
   void verifyOtpRequest(BuildContext context) {
+    String n1 = circlePin1Controller.text.toString();
+    String n2 = circlePin2Controller.text.toString();
+    String n3 = circlePin3Controller.text.toString();
+    String n4 = circlePin4Controller.text.toString();
+    String n5 = circlePin5Controller.text.toString();
+    String n6 = circlePin6Controller.text.toString();
+    otpCode = '$n1$n2$n3$n4$n5$n6';
+    setState(() {
+      print('code=$otpCode');
+      _isLoading = true;
+    });
     var result = EmailAuth.validate(
       receiverMail: widget.email,
       userOTP: otpCode,
     );
     if (timeValue <= 0) {
       print('Time Passed');
+      return;
     }
     if (result) {
       print('otp verified');
-      widget.addAllData(context);
+      addData();
     } else {
-      print('Otp Wrong');
+      Fluttertoast.showToast(
+        msg: "Wrong Otp Click On Resend a new code",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.black54,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+      setState(() {
+        _isLoading = false;
+      });
     }
+  }
+
+  void addData() async {
+    await widget.addAllData();
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   @override
@@ -161,7 +222,9 @@ class _OtpScreenState extends State<OtpScreen> {
         ),
         centerTitle: true,
         leading: IconButton(
-          onPressed: () {},
+          onPressed: () {
+            Navigator.pop(context);
+          },
           icon: Icon(
             Icons.arrow_back,
             size: 35,
@@ -343,7 +406,7 @@ class _OtpScreenState extends State<OtpScreen> {
                       onChanged: (value) {
                         otpCode += value;
 
-                        // pin6FocusNode.unfocus();
+                        pin6FocusNode.unfocus();
                         setState(() {
                           circlePinColor6 = darkBlueColor;
                         });
@@ -397,15 +460,17 @@ class _OtpScreenState extends State<OtpScreen> {
           border: Border.all(color: Colors.white, width: 1.5),
           color: Colors.blue[700],
         ),
-        child: Center(
-          child: Text(
-            'Send',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 20,
-            ),
-          ),
-        ),
+        child: _isLoading
+            ? threeBounceSpinkit
+            : Center(
+                child: Text(
+                  'Send',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                  ),
+                ),
+              ),
       ),
     );
   }
@@ -436,7 +501,7 @@ class _OtpScreenState extends State<OtpScreen> {
           timeValue = value.toInt();
           // print(timeValue);
           return Text(
-            "00:${value.toInt()}",
+            "Time Left:${value.toInt()}",
             style: TextStyle(color: Colors.white, fontSize: 18),
           );
         });

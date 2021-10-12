@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:smart_meet/models/appointment.dart';
-import 'package:smart_meet/providers/appointments_provider.dart';
+import 'package:smart_meet/providers/employee_pending_appointments_provider.dart';
 
 class GetImage extends StatefulWidget {
   const GetImage({Key key}) : super(key: key);

@@ -153,7 +153,7 @@ class EmployeeInfoContainer extends StatelessWidget {
                   ),
                   Text(
                     'jobTitle',
-                    style: TextStyle(color: Colors.black, fontSize: 14),
+                    style: TextStyle(color: Colors.transparent, fontSize: 14),
                   ),
                   SizedBox(
                     height: 20,

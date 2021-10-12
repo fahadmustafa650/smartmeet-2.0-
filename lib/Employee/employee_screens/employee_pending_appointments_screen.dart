@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:smart_meet/models/appointment.dart';
-import 'package:smart_meet/models/appointment_request_model.dart';
-import 'package:smart_meet/providers/appointments_provider.dart';
+import 'package:smart_meet/models/visitor_appointment_request_model.dart';
+import 'package:smart_meet/providers/employee_pending_appointments_provider.dart';
 import 'package:smart_meet/providers/employee_provider.dart';
 import 'package:smart_meet/widgets/appointment_request.dart';
 
@@ -24,12 +24,11 @@ class _EmployeePendingAppointmentsState
     extends State<EmployeePendingAppointments> {
   bool _isLoading = true;
   var _isInit = false;
-  List<PendingAppointment> appointmentPendingRequests;
+  List<Appointment> _appointmentPendingRequests;
   Future<void> _fetchAppointmentPendingData() async {
     try {
       final employeeId = Provider.of<EmployeesProvider>(context).getEmployee.id;
-      //final employeeId = '6131fdc707e7e10004ede68a';
-
+      //final employeeId = '615433e84dc54f00040af177';
       if (employeeId == null) return;
       await Provider.of<EmployeePendingAppointmentsRequestsProvider>(
         context,
@@ -51,6 +50,7 @@ class _EmployeePendingAppointmentsState
   void initState() {
     // TODO: implement initState
     super.initState();
+
     _isInit = true;
   }
 
@@ -65,7 +65,7 @@ class _EmployeePendingAppointmentsState
 
   @override
   Widget build(BuildContext context) {
-    appointmentPendingRequests =
+    _appointmentPendingRequests =
         Provider.of<EmployeePendingAppointmentsRequestsProvider>(context,
                 listen: true)
             .getPendingAppointmentRequests;
@@ -81,25 +81,25 @@ class _EmployeePendingAppointmentsState
               Navigator.pop(context);
             }),
         title: Text(
-          'Notifications',
-          style: TextStyle(
-            color: Colors.black,
-          ),
+          'Pending Appointments',
+          style: TextStyle(color: Colors.black, fontSize: 20),
         ),
       ),
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
-          : appointmentPendingRequests.length == 0
+          : _appointmentPendingRequests.length == 0
               ? Center(
                   child: Text('No Pending Requests'),
                 )
               : ListView.builder(
-                  itemCount: appointmentPendingRequests.length,
+                  itemCount: _appointmentPendingRequests.length,
                   itemBuilder: (ctx, index) {
-                    return AppointmentRequest(
-                      appointmentRequestData: appointmentPendingRequests[index],
+                    return VisitorAppointmentRequest(
+                      visitorAppointmentRequestData:
+                          _appointmentPendingRequests[index],
                     );
-                  }),
+                  },
+                ),
     );
   }
 }

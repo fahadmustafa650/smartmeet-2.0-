@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
-import 'package:smart_meet/models/appointment_request_model.dart';
+import 'package:smart_meet/models/visitor_appointment_request_model.dart';
 
 class AppointmentRequest extends StatelessWidget {
-  final AppointmentRequestData appointmentRequestData;
+  final VisitorAppointmentRequestData appointmentRequestData;
 
   const AppointmentRequest({this.appointmentRequestData});
 

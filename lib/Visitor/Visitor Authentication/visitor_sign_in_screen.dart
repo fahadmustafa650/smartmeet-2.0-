@@ -8,8 +8,8 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:smart_meet/Constants/constants.dart';
+import 'package:smart_meet/Visitor/VisitorForgetPassword/visitor_enter_email_screen.dart';
 import 'package:smart_meet/Visitor/visitor_home_screen.dart';
-import 'package:smart_meet/screens/enter_email_screen.dart';
 import 'package:smart_meet/widgets/login_with_fb.dart';
 import 'package:smart_meet/widgets/login_with_google.dart';
 
