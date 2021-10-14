@@ -2,33 +2,33 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:smart_meet/models/appointment.dart';
-import 'package:smart_meet/models/visitor_appointment_request_model.dart';
+// import 'package:smart_meet/models/visitor_appointment_request_model.dart';
 import 'package:smart_meet/providers/employee_pending_appointments_provider.dart';
-import 'package:smart_meet/providers/employee_provider.dart';
+// import 'package:smart_meet/providers/employee_provider.dart';
 import 'package:smart_meet/widgets/appointment_request.dart';
 
-class EmployeePendingAppointments extends StatefulWidget {
+class EmployeePendingAppointmentsScreen extends StatefulWidget {
   static final id = '/employee_pending_screen';
   final String employeeId;
 
-  const EmployeePendingAppointments({
+  const EmployeePendingAppointmentsScreen({
     @required this.employeeId,
   });
 
   @override
-  _EmployeePendingAppointmentsState createState() =>
-      _EmployeePendingAppointmentsState();
+  _EmployeePendingAppointmentsScreenState createState() =>
+      _EmployeePendingAppointmentsScreenState();
 }
 
-class _EmployeePendingAppointmentsState
-    extends State<EmployeePendingAppointments> {
+class _EmployeePendingAppointmentsScreenState
+    extends State<EmployeePendingAppointmentsScreen> {
   bool _isLoading = true;
   var _isInit = false;
   List<Appointment> _appointmentPendingRequests;
   Future<void> _fetchAppointmentPendingData() async {
     try {
-      final employeeId = Provider.of<EmployeesProvider>(context).getEmployee.id;
-      //final employeeId = '615433e84dc54f00040af177';
+      //final employeeId = Provider.of<EmployeesProvider>(context).getEmployee.id;
+      final employeeId = '615433e84dc54f00040af177';
       if (employeeId == null) return;
       await Provider.of<EmployeePendingAppointmentsRequestsProvider>(
         context,
@@ -72,6 +72,7 @@ class _EmployeePendingAppointmentsState
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
+        centerTitle: true,
         leading: IconButton(
             icon: Icon(
               Icons.arrow_back,

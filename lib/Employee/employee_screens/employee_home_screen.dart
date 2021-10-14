@@ -173,7 +173,7 @@ class _EmployeeHomeScreenState extends State<EmployeeHomeScreen> {
           ),
           GestureDetector(
             onTap: () {
-              Navigator.pushNamed(context, EmployeePendingAppointments.id);
+              Navigator.pushNamed(context, EmployeePendingAppointmentsScreen.id);
             },
             child: InfoPanel(
               title: 'Pending\nAppointments',

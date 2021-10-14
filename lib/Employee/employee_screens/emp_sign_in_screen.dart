@@ -41,7 +41,7 @@ class _EmployeeSignInScreenState extends State<EmployeeSignInScreen> {
     _passwordController.dispose();
   }
 
-  void successMessage() {
+  void _successMessage() {
     Fluttertoast.showToast(
       msg: "Sign In Successfully",
       toastLength: Toast.LENGTH_SHORT,
@@ -61,7 +61,7 @@ class _EmployeeSignInScreenState extends State<EmployeeSignInScreen> {
     ));
   }
 
-  void signIn() async {
+  void _signIn() async {
     final _isValid = _formKey.currentState.validate();
     final url = Uri.parse(
         'https://pure-woodland-42301.herokuapp.com/api/employee/signin');
@@ -95,15 +95,23 @@ class _EmployeeSignInScreenState extends State<EmployeeSignInScreen> {
           _isLoading = false;
         });
         print('statusCode=${response.statusCode}');
-        successMessage();
+        _successMessage();
         Navigator.pushNamed(
           context,
           EmployeeHomeScreen.id,
           arguments: {'email': _emailController.text.toString()},
         );
       } else {
+        setState(() {
+          _isLoading = false;
+        });
         if (jsonDecode(res)['error'] != null) {
           _showSnackBar(jsonDecode(res));
+          setState(() {
+            _isLoading = false;
+          });
+        } else if (jsonDecode(res)['message'] != null) {
+          _showSnackBar(jsonDecode(res)['message']);
           setState(() {
             _isLoading = false;
           });
@@ -122,7 +130,7 @@ class _EmployeeSignInScreenState extends State<EmployeeSignInScreen> {
     }
   }
 
-  Widget resgisterButton() {
+  Widget _resgisterButton() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -157,7 +165,7 @@ class _EmployeeSignInScreenState extends State<EmployeeSignInScreen> {
       height: 40.0,
       child: TextButton(
         onPressed: () {
-          signIn();
+          _signIn();
           // Navigator.pushNamed(context, VisitorHomeScreen.id);
         },
         child: Center(
@@ -228,7 +236,7 @@ class _EmployeeSignInScreenState extends State<EmployeeSignInScreen> {
                     SizedBox(
                       height: 13.0,
                     ),
-                    resgisterButton(),
+                    _resgisterButton(),
                     SizedBox(
                       height: 13.0,
                     ),
@@ -373,15 +381,15 @@ class _EmployeeSignInScreenState extends State<EmployeeSignInScreen> {
     );
   }
 
-  void setVisitingFlag() async {
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-    preferences.setBool('alreadyVisited', true);
-    print(preferences);
-  }
+  // void setVisitingFlag() async {
+  //   SharedPreferences preferences = await SharedPreferences.getInstance();
+  //   preferences.setBool('alreadyVisited', true);
+  //   print(preferences);
+  // }
 
-  Future<bool> getVisitingFlag() async {
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-    bool alreadyVisited = preferences.getBool('alreadyVisited') ?? false;
-    return alreadyVisited;
-  }
+  // Future<bool> getVisitingFlag() async {
+  //   SharedPreferences preferences = await SharedPreferences.getInstance();
+  //   bool alreadyVisited = preferences.getBool('alreadyVisited') ?? false;
+  //   return alreadyVisited;
+  // }
 }

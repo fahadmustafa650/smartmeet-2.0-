@@ -3,15 +3,11 @@ import 'dart:typed_data';
 import 'package:email_auth/email_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:http/http.dart' as http;
 import 'package:smart_meet/Constants/constants.dart';
-import 'package:smart_meet/Visitor/Visitor%20Authentication/visitor_sign_in_screen.dart';
-import 'package:smart_meet/models/visitor_model.dart';
-import 'new_password_screen.dart';
 
 class OtpScreen extends StatefulWidget {
   static final id = '/otp_screen';
+
   final String email;
   final Function addAllData;
   // final Visitor visitor;
@@ -24,6 +20,8 @@ class OtpScreen extends StatefulWidget {
 class _OtpScreenState extends State<OtpScreen> {
   int timeValue = 30;
   String otpCode = '';
+  var beginTime = 90.0;
+  var endTime = 0.0;
   //FOCUS NODES
   FocusNode pin1FocusNode;
   FocusNode pin2FocusNode;
@@ -48,7 +46,7 @@ class _OtpScreenState extends State<OtpScreen> {
   //Loading
   bool _isLoading = false;
 
-  void clearAll() {
+  void _clearAll() {
     setState(() {
       otpCode = '';
       circlePinColor1 = Colors.white;
@@ -71,7 +69,7 @@ class _OtpScreenState extends State<OtpScreen> {
   void initState() {
     super.initState();
     //print(widget.email);
-    sendOtpRequest();
+    _sendOtpRequest();
     pin1FocusNode = FocusNode();
     pin2FocusNode = FocusNode();
     pin3FocusNode = FocusNode();
@@ -148,9 +146,9 @@ class _OtpScreenState extends State<OtpScreen> {
     }
   }
 
-  void sendOtpRequest() {
+  void _sendOtpRequest() {
     try {
-      EmailAuth.sessionName = 'Visitor Session1';
+      EmailAuth.sessionName = 'Visitor Session';
 
       EmailAuth.sendOtp(receiverMail: widget.email);
     } catch (error) {
@@ -335,7 +333,6 @@ class _OtpScreenState extends State<OtpScreen> {
                       decoration: otpInputDecoration,
                       onChanged: (value) {
                         if (value.length == 1) otpCode += value;
-
                         pin3FocusNode.unfocus();
                         setState(() {
                           circlePinColor3 = darkBlueColor;
@@ -435,11 +432,11 @@ class _OtpScreenState extends State<OtpScreen> {
                       fontStyle: FontStyle.normal),
                 ),
               ),
-              resendCodeBtn(),
+              _resendCodeBtn(),
               SizedBox(
                 height: 10,
               ),
-              sendBtn(context, screenWidth)
+              _sendBtn(context, screenWidth)
             ],
           ),
         ),
@@ -447,7 +444,7 @@ class _OtpScreenState extends State<OtpScreen> {
     );
   }
 
-  GestureDetector sendBtn(BuildContext context, double screenWidth) {
+  GestureDetector _sendBtn(BuildContext context, double screenWidth) {
     return GestureDetector(
       onTap: () {
         verifyOtpRequest(context);
@@ -475,11 +472,18 @@ class _OtpScreenState extends State<OtpScreen> {
     );
   }
 
-  GestureDetector resendCodeBtn() {
+  GestureDetector _resendCodeBtn() {
     return GestureDetector(
       onTap: () {
-        sendOtpRequest();
-        clearAll();
+        // _sendOtpRequest();
+        // _clearAll();
+        // setState(() {
+        //   beginTime = 90.0;
+        //   endTime = 0.0;
+        // });
+        Navigator.push(context, MaterialPageRoute(builder: (ctx) {
+          return OtpScreen(email: widget.email, addAllData: widget.addAllData);
+        }));
       },
       child: Container(
         //alignment: Alignment.topLeft,
@@ -495,15 +499,16 @@ class _OtpScreenState extends State<OtpScreen> {
 
   Widget buildTimer() {
     return TweenAnimationBuilder(
-        tween: Tween(begin: 90.0, end: 0.0),
-        duration: Duration(seconds: 90),
-        builder: (_, value, child) {
-          timeValue = value.toInt();
-          // print(timeValue);
-          return Text(
-            "Time Left:${value.toInt()}",
-            style: TextStyle(color: Colors.white, fontSize: 18),
-          );
-        });
+      tween: Tween(begin: beginTime, end: endTime),
+      duration: Duration(seconds: 90),
+      builder: (_, value, child) {
+        timeValue = value.toInt();
+        // print(timeValue);
+        return Text(
+          "Time Left:${value.toInt()}",
+          style: TextStyle(color: Colors.white, fontSize: 18),
+        );
+      },
+    );
   }
 }

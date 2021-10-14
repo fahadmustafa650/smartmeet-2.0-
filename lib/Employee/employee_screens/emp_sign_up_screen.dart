@@ -101,8 +101,7 @@ class _EmployeeSignUpScreenState extends State<EmployeeSignUpScreen> {
       if (response.statusCode == 200) {
         showMessage('Sign Up Successfully');
         Navigator.pushNamed(context, EmployeeSignInScreen.id);
-      }
-      if (response.statusCode == 400) {
+      } else {
         final msg = jsonDecode(response.body)['error'];
         showMessage(msg.toString());
       }
@@ -213,18 +212,18 @@ class _EmployeeSignUpScreenState extends State<EmployeeSignUpScreen> {
       return;
     }
     _formKey.currentState.save();
-    print('uploadfile');
-    await _addEmployeeData(context);
-    print('data added');
-    // Navigator.push(
-    //   context,
-    //   MaterialPageRoute(
-    //     builder: (context) => OtpScreen(
-    //       email: _emailController.text.toString(),
-    //       addAllData: _addEmployeeData,
-    //     ),
-    //   ),
-    // );
+    // print('uploadfile');
+    // await _addEmployeeData(context);
+    // print('data added');
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => OtpScreen(
+          email: _emailController.text.toString(),
+          addAllData: _addEmployeeData,
+        ),
+      ),
+    );
   }
 
   void _imgFromGallery() async {

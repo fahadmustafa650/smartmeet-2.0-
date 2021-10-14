@@ -32,9 +32,9 @@ class _EmployeeBookedAppointmentsScreenState
   bool _isLoading = true;
   List<Appointment> _appointmentBookedAppointments;
   void fetchAndGetData() async {
-    final employeeId =
-        Provider.of<EmployeesProvider>(context, listen: false).getEmployee.id;
-    //final employeeId = '615433e84dc54f00040af177';
+    // final employeeId =
+    //     Provider.of<EmployeesProvider>(context, listen: false).getEmployee.id;
+    final employeeId = '615433e84dc54f00040af177';
 
     // String name =
     //     '${Provider.of<EmployeesProvider>(context, listen: false).getEmployee.firstName} ${Provider.of<EmployeesProvider>(context, listen: false).getEmployee.lastName} ';
@@ -44,6 +44,7 @@ class _EmployeeBookedAppointmentsScreenState
       return;
     }
     try {
+      print('abc');
       await Provider.of<EmployeeBookedAppointmentsProvider>(context,
               listen: false)
           .bookedAppointmentsList(employeeId)
@@ -57,6 +58,7 @@ class _EmployeeBookedAppointmentsScreenState
         });
       });
     } catch (error) {
+      print('error=$error');
       throw error;
     }
   }
@@ -133,9 +135,10 @@ class _EmployeeBookedInfoState extends State<EmployeeBookedInfo> {
   void _fetchData() async {
     print('visiId=${widget.visitorId}');
     final url = Uri.parse(
-        'https://pure-woodland-42301.herokuapp.com/api/visitor/usersProfile/${widget.visitorId}');
+        'https://pure-woodland-42301.herokuapp.com/api/visitor/usersProfile/6160912d9ddfb800041e6fd5');
     try {
       final response = await http.get(url);
+      print('body=${response.body}');
       if (response.statusCode == 200) {
         responseData = jsonDecode(response.body)['user'];
         setState(() {
@@ -215,9 +218,9 @@ class _EmployeeBookedInfoState extends State<EmployeeBookedInfo> {
                           ),
                         ],
                       ),
-                      SizedBox(
-                        height: 20,
-                      ),
+                      // SizedBox(
+                      //   height: 20,
+                      // ),
                       // GestureDetector(
                       //   onTap: () {
                       //     Navigator.pushNamed(

@@ -36,17 +36,21 @@ class PasswordChangedSuccess extends StatelessWidget {
                       if (isEmployee) {
                         Navigator.push(context,
                             MaterialPageRoute(builder: (ctx) {
-                          return EmployeeSignInScreen();
+                          return EmployeeSignInScreen(
+                            isLoggedIn: false,
+                          );
                         }));
                       } else {
                         Navigator.push(context,
                             MaterialPageRoute(builder: (ctx) {
-                          return VisitorSignInScreen();
+                          return VisitorSignInScreen(
+                            isLoggedIn: false,
+                          );
                         }));
                       }
                     },
                     child: Text(
-                      'Go to Sign In',
+                      'Go to Login',
                       style: TextStyle(
                         color: Colors.green,
                         fontSize: 20,

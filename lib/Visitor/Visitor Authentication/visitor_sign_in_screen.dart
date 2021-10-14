@@ -374,15 +374,15 @@ class _VisitorSignInScreenState extends State<VisitorSignInScreen> {
     );
   }
 
-  void setVisitingFlag() async {
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-    preferences.setBool('alreadyVisited', true);
-    print(preferences);
-  }
+  // void setVisitingFlag() async {
+  //   SharedPreferences preferences = await SharedPreferences.getInstance();
+  //   preferences.setBool('alreadyVisited', true);
+  //   print(preferences);
+  // }
 
-  Future<bool> getVisitingFlag() async {
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-    bool alreadyVisited = preferences.getBool('alreadyVisited') ?? false;
-    return alreadyVisited;
-  }
+  // Future<bool> getVisitingFlag() async {
+  //   SharedPreferences preferences = await SharedPreferences.getInstance();
+  //   bool alreadyVisited = preferences.getBool('alreadyVisited') ?? false;
+  //   return alreadyVisited;
+  // }
 }

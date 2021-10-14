@@ -105,7 +105,7 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
         debugShowMaterialGrid: false,
-        home: EmployeeSignInScreen(),
+        home: EmployeePendingAppointmentsScreen(),
         // initialRoute: RequestAppointmentScreen.id,
         debugShowCheckedModeBanner: false,
         routes: {
@@ -126,6 +126,8 @@ class MyApp extends StatelessWidget {
               EmployeeEditProfileScreen(),
           EmployeeBookedAppointmentsScreen.id: (context) =>
               EmployeeBookedAppointmentsScreen(),
+          EmployeePendingAppointmentsScreen.id: (context) =>
+              EmployeePendingAppointmentsScreen(),
           EmployeeNewPasswordScreen.id: (context) =>
               EmployeeNewPasswordScreen(),
           VisitorEnterEmailScreen.id: (context) => VisitorEnterEmailScreen(),

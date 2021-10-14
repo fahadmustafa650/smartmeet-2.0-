@@ -16,7 +16,7 @@ class EmployeeEnterEmailScreen extends StatefulWidget {
 class _EmployeeEnterEmailScreenState extends State<EmployeeEnterEmailScreen> {
   final _emailController = TextEditingController();
   bool _isLoading = false;
-  void goToNewPasswordScreen() {
+  void _goToNewPasswordScreen() {
     Navigator.push(context, MaterialPageRoute(builder: (ctx) {
       return EmployeeNewPasswordScreen(
         email: _emailController.text.toString(),
@@ -116,7 +116,7 @@ class _EmployeeEnterEmailScreenState extends State<EmployeeEnterEmailScreen> {
     });
     try {
       final response = await http.get(url);
-      print('isEmailExist=${response.statusCode}');
+      print('isEmailExistCode=${response.statusCode}');
       if (response.statusCode == 200) {
         setState(() {
           _isLoading = false;
@@ -127,7 +127,7 @@ class _EmployeeEnterEmailScreenState extends State<EmployeeEnterEmailScreen> {
             builder: (ctx) {
               return OtpScreen(
                 email: _emailController.text.toString(),
-                addAllData: goToNewPasswordScreen,
+                addAllData: _goToNewPasswordScreen,
               );
             },
           ),
