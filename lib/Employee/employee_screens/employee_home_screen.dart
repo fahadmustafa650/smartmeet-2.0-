@@ -6,7 +6,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smart_meet/Constants/constants.dart';
 import 'package:smart_meet/Employee/employee_screens/emp_sign_in_screen.dart';
 import 'package:smart_meet/Employee/employee_screens/employee_pending_appointments_screen.dart';
-import 'package:smart_meet/models/employee_model.dart';
 import 'package:smart_meet/providers/employee_provider.dart';
 import 'package:smart_meet/screens/chat_screen.dart';
 import 'package:smart_meet/screens/login_as_screen.dart';
@@ -173,7 +172,8 @@ class _EmployeeHomeScreenState extends State<EmployeeHomeScreen> {
           ),
           GestureDetector(
             onTap: () {
-              Navigator.pushNamed(context, EmployeePendingAppointmentsScreen.id);
+              Navigator.pushNamed(
+                  context, EmployeePendingAppointmentsScreen.id);
             },
             child: InfoPanel(
               title: 'Pending\nAppointments',

@@ -17,8 +17,6 @@ class _ShowQrCodeScreenState extends State<ShowQrCodeScreen> {
 
   bool isLoading = true;
 
-  var _isInit = false;
-
   void getQrcode() async {
     String appointmentId = widget.appointmentId;
     //String appointmentId = '61292ccba64b18000460842a';

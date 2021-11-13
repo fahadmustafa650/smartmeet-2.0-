@@ -1,9 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import 'package:smart_meet/Constants/constants.dart';
+import 'package:smart_meet/screens/new_password_screen.dart';
 import 'package:smart_meet/screens/otp_screen.dart';
 import 'package:http/http.dart' as http;
-
-import 'employee_new_password_screen.dart';
+import 'package:http/http.dart';
 
 class EmployeeEnterEmailScreen extends StatefulWidget {
   static final id = '/employee_enter_email_screen';
@@ -15,10 +16,10 @@ class EmployeeEnterEmailScreen extends StatefulWidget {
 
 class _EmployeeEnterEmailScreenState extends State<EmployeeEnterEmailScreen> {
   final _emailController = TextEditingController();
-  bool _isLoading = false;
-  void _goToNewPasswordScreen() {
+
+  void goToNewPasswordScreen() {
     Navigator.push(context, MaterialPageRoute(builder: (ctx) {
-      return EmployeeNewPasswordScreen(
+      return NewPasswordScreen(
         email: _emailController.text.toString(),
       );
     }));
@@ -93,41 +94,32 @@ class _EmployeeEnterEmailScreenState extends State<EmployeeEnterEmailScreen> {
             borderRadius: BorderRadius.circular(30),
             border: Border.all(color: Colors.white, width: 1.5),
             color: Colors.blue[700]),
-        child: _isLoading
-            ? threeBounceSpinkit
-            : Center(
-                child: Text(
-                  'Send',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                  ),
-                ),
-              ),
+        child: Center(
+          child: Text(
+            'Send',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+            ),
+          ),
+        ),
       ),
     );
   }
 
   Future<void> _isEmailExist() async {
     final url = Uri.parse(
-        'https://pure-woodland-42301.herokuapp.com/api/employee/verifyemail/${_emailController.text.toString()}');
-    setState(() {
-      _isLoading = true;
-    });
+        'https://pure-woodland-42301.herokuapp.com/api/forgetPassword/${_emailController.text.toString()}');
     try {
       final response = await http.get(url);
-      print('isEmailExistCode=${response.statusCode}');
       if (response.statusCode == 200) {
-        setState(() {
-          _isLoading = false;
-        });
         Navigator.push(
           context,
           MaterialPageRoute(
             builder: (ctx) {
               return OtpScreen(
                 email: _emailController.text.toString(),
-                addAllData: _goToNewPasswordScreen,
+                addAllData: goToNewPasswordScreen,
               );
             },
           ),

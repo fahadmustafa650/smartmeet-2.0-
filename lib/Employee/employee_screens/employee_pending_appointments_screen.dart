@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:smart_meet/models/appointment.dart';
 // import 'package:smart_meet/models/visitor_appointment_request_model.dart';
 import 'package:smart_meet/providers/employee_pending_appointments_provider.dart';
+import 'package:smart_meet/providers/employee_provider.dart';
 // import 'package:smart_meet/providers/employee_provider.dart';
 import 'package:smart_meet/widgets/appointment_request.dart';
 
@@ -24,11 +25,12 @@ class _EmployeePendingAppointmentsScreenState
     extends State<EmployeePendingAppointmentsScreen> {
   bool _isLoading = true;
   var _isInit = false;
-  List<Appointment> _appointmentPendingRequests;
+  List<Appointment> _appointmentPendingRequestsList;
+
   Future<void> _fetchAppointmentPendingData() async {
     try {
-      //final employeeId = Provider.of<EmployeesProvider>(context).getEmployee.id;
-      final employeeId = '615433e84dc54f00040af177';
+      final employeeId = Provider.of<EmployeesProvider>(context).getEmployee.id;
+      //final employeeId = '6160912d9ddfb800041e6fd5';
       if (employeeId == null) return;
       await Provider.of<EmployeePendingAppointmentsRequestsProvider>(
         context,
@@ -50,7 +52,6 @@ class _EmployeePendingAppointmentsScreenState
   void initState() {
     // TODO: implement initState
     super.initState();
-
     _isInit = true;
   }
 
@@ -65,7 +66,7 @@ class _EmployeePendingAppointmentsScreenState
 
   @override
   Widget build(BuildContext context) {
-    _appointmentPendingRequests =
+    _appointmentPendingRequestsList =
         Provider.of<EmployeePendingAppointmentsRequestsProvider>(context,
                 listen: true)
             .getPendingAppointmentRequests;
@@ -88,16 +89,16 @@ class _EmployeePendingAppointmentsScreenState
       ),
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
-          : _appointmentPendingRequests.length == 0
+          : _appointmentPendingRequestsList.length == 0
               ? Center(
                   child: Text('No Pending Requests'),
                 )
               : ListView.builder(
-                  itemCount: _appointmentPendingRequests.length,
+                  itemCount: _appointmentPendingRequestsList.length,
                   itemBuilder: (ctx, index) {
                     return VisitorAppointmentRequest(
                       visitorAppointmentRequestData:
-                          _appointmentPendingRequests[index],
+                          _appointmentPendingRequestsList[index],
                     );
                   },
                 ),

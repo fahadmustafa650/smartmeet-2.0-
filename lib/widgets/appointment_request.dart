@@ -23,16 +23,16 @@ class _VisitorAppointmentRequestState extends State<VisitorAppointmentRequest> {
   var data;
   var name;
 
-  void showUndoSnackbar() {
-    final snackBar = SnackBar(
-      content: Text('Appountment Request Rejected'),
-      action: SnackBarAction(
-        label: 'Undo',
-        onPressed: () {},
-      ),
-    );
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-  }
+  // void showUndoSnackbar() {
+  //   final snackBar = SnackBar(
+  //     content: Text('Appountment Request Rejected'),
+  //     action: SnackBarAction(
+  //       label: 'Undo',
+  //       onPressed: () {},
+  //     ),
+  //   );
+  //   ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  // }
 
   Future<void> showWarning() {
     return showDialog<String>(
@@ -46,11 +46,15 @@ class _VisitorAppointmentRequestState extends State<VisitorAppointmentRequest> {
             child: const Text('No'),
           ),
           TextButton(
-            onPressed: () {
+            onPressed: () async {
               // print('apId=${widget.appointmentRequestData.id}');
-              Provider.of<EmployeePendingAppointmentsRequestsProvider>(context,
+              await Provider.of<EmployeePendingAppointmentsRequestsProvider>(
+                      context,
                       listen: false)
-                  .rejectAppointment(widget.visitorAppointmentRequestData.id);
+                  .rejectAppointment(widget.visitorAppointmentRequestData.id)
+                  .then((value) {
+                showSnackMessage(context, 'Appointment Request Rejected');
+              });
               Navigator.pop(context, 'Yes');
             },
             child: const Text('Yes'),
@@ -183,12 +187,24 @@ class _VisitorAppointmentRequestState extends State<VisitorAppointmentRequest> {
 
   void acceptAppointment(BuildContext context) async {
     try {
-      Provider.of<EmployeePendingAppointmentsRequestsProvider>(context,
+      await Provider.of<EmployeePendingAppointmentsRequestsProvider>(context,
               listen: false)
-          .acceptAppointment(widget.visitorAppointmentRequestData.id);
+          .acceptAppointment(widget.visitorAppointmentRequestData.id)
+          .then((value) {
+        if (value == 200) {
+          showSnackMessage(context, 'Appointment Request Accepted');
+        }
+      });
     } catch (error) {
       throw error;
     }
+  }
+
+  void showSnackMessage(BuildContext context, String msg) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(msg),
+      duration: Duration(milliseconds: 500),
+    ));
   }
 
   Widget acceptButton() {

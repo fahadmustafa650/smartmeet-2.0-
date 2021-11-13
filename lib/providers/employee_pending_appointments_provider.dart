@@ -5,15 +5,15 @@ import 'package:smart_meet/models/appointment.dart';
 import 'package:http/http.dart' as http;
 
 class EmployeePendingAppointmentsRequestsProvider with ChangeNotifier {
-  List<Appointment> _pendingAppointmentRequests = [];
+  List<Appointment> _pendingAppointmentRequestsList = [];
 
   List<Appointment> get getPendingAppointmentRequests {
-    return _pendingAppointmentRequests == null
+    return _pendingAppointmentRequestsList == null
         ? []
-        : [..._pendingAppointmentRequests];
+        : [..._pendingAppointmentRequestsList];
   }
 
-  void acceptAppointment(String id) async {
+  Future<int> acceptAppointment(String id) async {
     final url = Uri.parse(
         'https://pure-woodland-42301.herokuapp.com/api/employee/acceptappointment/$id');
 
@@ -21,39 +21,40 @@ class EmployeePendingAppointmentsRequestsProvider with ChangeNotifier {
       final response = await http.post(url);
       print('response=${response.statusCode}');
       if (response.statusCode == 200) {
-        int index = _pendingAppointmentRequests.indexWhere((value) {
+        int index = _pendingAppointmentRequestsList.indexWhere((value) {
           return value.id == id;
         });
         print('index=$index');
         if (index != -1) {
-          _pendingAppointmentRequests.removeAt(index);
+          _pendingAppointmentRequestsList.removeAt(index);
           notifyListeners();
         }
       }
+      return response.statusCode;
     } catch (error) {
       throw error;
     }
   }
 
-  void rejectAppointment(String id) async {
+  Future<int> rejectAppointment(String id) async {
     final url = Uri.parse(
         'https://pure-woodland-42301.herokuapp.com/api/employee/rejectAppointment/$id');
-    int index = _pendingAppointmentRequests.indexWhere((value) {
+    int index = _pendingAppointmentRequestsList.indexWhere((value) {
       return value.id == id;
     });
-    var pendingAppointment = _pendingAppointmentRequests[index];
+    var pendingAppointment = _pendingAppointmentRequestsList[index];
     print('index=$index');
     if (index != -1) {
-      _pendingAppointmentRequests.removeAt(index);
+      _pendingAppointmentRequestsList.removeAt(index);
       notifyListeners();
       try {
         final response = await http.post(url);
         print('code=${response.statusCode}');
         if (response.statusCode > 201) {
-          _pendingAppointmentRequests.insert(index, pendingAppointment);
+          _pendingAppointmentRequestsList.insert(index, pendingAppointment);
           notifyListeners();
-          throw 'Could not Rejected';
         }
+        return response.statusCode;
         // if (response.statusCode == 200) {
         //   // int index = _pendingAppointmentRequests.indexWhere((value) {
         //   //   return value.id == id;
@@ -64,11 +65,12 @@ class EmployeePendingAppointmentsRequestsProvider with ChangeNotifier {
         //   // }
         // }
       } catch (error) {
-        _pendingAppointmentRequests.insert(index, pendingAppointment);
+        _pendingAppointmentRequestsList.insert(index, pendingAppointment);
         notifyListeners();
         throw error;
       }
     }
+    return 0;
   }
 
   Future<void> pendingAppointmentRequestsList(String id) async {
@@ -76,15 +78,15 @@ class EmployeePendingAppointmentsRequestsProvider with ChangeNotifier {
         'https://pure-woodland-42301.herokuapp.com/api/employee/$id/pendingappointmentrequests');
     try {
       final response = await http.get(url);
-      // print(response.body);
-      // print(response.statusCode);
+      print('body=${response.body}');
+      print('code=${response.statusCode}');
       if (response.statusCode == 200) {
         final extractedData = await json.decode(response.body) as List<dynamic>;
         //print(extractedData);
         //print('extractedData=$extractedData');
-        _pendingAppointmentRequests = [];
+        _pendingAppointmentRequestsList = [];
         for (var data in extractedData) {
-          _pendingAppointmentRequests.add(
+          _pendingAppointmentRequestsList.add(
             Appointment(
               id: data['_id'].toString(),
               visitorId: data['VisitorId'].toString(),
@@ -96,7 +98,7 @@ class EmployeePendingAppointmentsRequestsProvider with ChangeNotifier {
           );
         }
       } else if (response.statusCode == 399) {
-        _pendingAppointmentRequests = [];
+        _pendingAppointmentRequestsList = [];
       }
       notifyListeners();
     } catch (error) {

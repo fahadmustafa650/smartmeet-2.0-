@@ -60,10 +60,16 @@ class _VisitorSignUpScreenState extends State<VisitorSignUpScreen> {
     // print('Download-Link: $urlDownload');
   }
 
-  Future<void> _addVisitorData(BuildContext context) async {
+  void _addVisitorData(BuildContext context) async {
     final url = Uri.parse(
         "https://pure-woodland-42301.herokuapp.com/api/visitor/Visitorsignup");
-
+    print('fName=${_firstNameController.text.toString()}');
+    print('lName=${_lastNameController.text.toString()}');
+    print('email=${_emailController.text.toString()}');
+    print('username=${_userNameController.text.toString()}');
+    print('password=${_passwordController.text.toString()}');
+    print('dateofbirth=${_dateOfBirth.toIso8601String()}');
+    print('url=$imageUrl');
     try {
       await _uploadFile();
       final response = await http.post(
@@ -79,6 +85,7 @@ class _VisitorSignUpScreenState extends State<VisitorSignUpScreen> {
           'avatar': imageUrl,
         }),
       );
+      print('signupCode=${response.statusCode}');
       if (response.statusCode == 200) {
         Fluttertoast.showToast(
           msg: "Sign Up Successfully",
@@ -91,7 +98,7 @@ class _VisitorSignUpScreenState extends State<VisitorSignUpScreen> {
         );
         Navigator.pushNamed(context, VisitorSignInScreen.id);
       }
-      return response;
+      //return response;
     } catch (error) {
       print('error occured');
       throw error;

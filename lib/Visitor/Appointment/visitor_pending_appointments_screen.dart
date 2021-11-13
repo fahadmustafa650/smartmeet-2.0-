@@ -5,8 +5,8 @@ import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:smart_meet/models/appointment.dart';
-import 'package:smart_meet/models/sent_appointment_model.dart';
-import 'package:smart_meet/providers/visitor_booked_appointments_providers.dart';
+// import 'package:smart_meet/models/sent_appointment_model.dart';
+// import 'package:smart_meet/providers/visitor_booked_appointments_providers.dart';
 import 'package:smart_meet/providers/visitor_pending_appointments_provider.dart';
 import 'package:smart_meet/providers/visitor_provider.dart';
 
@@ -37,7 +37,7 @@ class _VisitorPendingAppointmentsScreenState
               listen: false)
           .pendingAppointmentRequestsList(visitorId)
           .then((_) {
-        print('then');
+        //print('then');
         setState(() {
           _appointmentPendingRequests =
               Provider.of<VisitorPendingAppointmentsRequestsProvider>(context,
@@ -177,8 +177,11 @@ class _EmployeeBookedInfoState extends State<EmployeeBookedInfo> {
               elevation: 3,
               child: Row(
                 children: [
-                  Image(
-                    image: NetworkImage(responseData['avatar']),
+                  Container(
+                    height: 150,
+                    child: Image(
+                      image: NetworkImage(responseData['avatar']),
+                    ),
                   ),
                   SizedBox(
                     width: 5,
@@ -250,6 +253,7 @@ class _EmployeeBookedInfoState extends State<EmployeeBookedInfo> {
     print('cancel pressed');
     await Provider.of<VisitorPendingAppointmentsRequestsProvider>(context,
             listen: false)
-        .cancelAppointment(widget.appointmentId);
+        .cancelAppointment(widget.appointmentId)
+        .then((value) {});
   }
 }

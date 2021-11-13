@@ -11,11 +11,11 @@ class InfoPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
+    // final screenWidth = MediaQuery.of(context).size.width;
+    // final screenHeight = MediaQuery.of(context).size.height;
     return Container(
-      width: screenWidth * 0.2,
-      height: screenWidth * 0.2,
+      // width: screenWidth * 0.2,
+      // height: screenWidth * 0.2,
       child: Card(
         elevation: 7,
         margin: EdgeInsets.only(top: 25),

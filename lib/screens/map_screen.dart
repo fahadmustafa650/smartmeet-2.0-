@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
 import 'package:smart_meet/Constants/constants.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:smart_meet/models/direction_repository.dart';
 import 'package:smart_meet/models/directions.dart';
-
-const mapApiKey = 'AIzaSyAofr6MTAVjER_EanHr_GFsMGzOcehOeUU';
+import 'package:smart_meet/providers/employee_office_location_provider.dart';
 
 class MapScreen extends StatefulWidget {
   @override
@@ -30,7 +30,8 @@ class _MapScreenState extends State<MapScreen> {
 
   void locatePosition() async {
     Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
+      desiredAccuracy: LocationAccuracy.high,
+    );
     currentPosition = position;
     LatLng latLng = LatLng(currentPosition.latitude, currentPosition.longitude);
     CameraPosition cameraPosition = CameraPosition(
@@ -41,15 +42,22 @@ class _MapScreenState extends State<MapScreen> {
         .animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
   }
 
+  var _isInit = false;
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    var _isInit = true;
     locatePosition();
   }
 
   @override
   void dispose() {
+    if (_isInit) {
+      Provider.of<EmployeeOfficeLocationProvider>(context);
+      //_setDestination();
+    }
+
     _googleMapController.dispose();
     super.dispose();
   }
@@ -133,7 +141,7 @@ class _MapScreenState extends State<MapScreen> {
                       .toList(),
                 ),
             },
-            onLongPress: _addMarker,
+            // onLongPress: _setDestination,
           ),
           if (_info != null)
             Positioned(
@@ -178,7 +186,7 @@ class _MapScreenState extends State<MapScreen> {
     );
   }
 
-  void _addMarker(LatLng pos) async {
+  void _setDestination(LatLng pos) async {
     // if (_origin == null || (_origin != null && _destination != null)) {
     //   // Origin is not set OR Origin/Destination are both set
     //   // Set origin
@@ -196,7 +204,8 @@ class _MapScreenState extends State<MapScreen> {
     //     // Reset info
     //     _info = null;
     //   });
-    // } else {
+    // }
+    //else {
     // Origin is already set
     // Set destination
     setState(() {
@@ -210,9 +219,10 @@ class _MapScreenState extends State<MapScreen> {
 
     // Get directions
     final directions = await DirectionsRepository().getDirections(
-        origin: LatLng(currentPosition.latitude, currentPosition.longitude),
-        destination: pos);
-    print('directions=$directions');
+      origin: LatLng(currentPosition.latitude, currentPosition.longitude),
+      destination: pos,
+    );
+
     setState(() => _info = directions);
     //}
   }

@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -12,12 +11,12 @@ import 'package:smart_meet/providers/visitor_booked_appointments_providers.dart'
 import 'package:http/http.dart' as http;
 import 'package:string_extensions/string_extensions.dart';
 
-extension CapExtension on String {
-  String get inCaps => '${this[0].toUpperCase()}${this.substring(1)}';
-  String get allInCaps => this.toUpperCase();
-  String get capitalizeFirstofEach =>
-      this.split(" ").map((str) => str.capitalize).join(" ");
-}
+// extension CapExtension on String {
+//   String get inCaps => '${this[0].toUpperCase()}${this.substring(1)}';
+//   String get allInCaps => this.toUpperCase();
+//   String get capitalizeFirstofEach =>
+//       this.split(" ").map((str) => str.capitalize).join(" ");
+// }
 
 class EmployeeBookedAppointmentsScreen extends StatefulWidget {
   static final id = '/employee_booked_appointment_result';
@@ -32,9 +31,9 @@ class _EmployeeBookedAppointmentsScreenState
   bool _isLoading = true;
   List<Appointment> _appointmentBookedAppointments;
   void fetchAndGetData() async {
-    // final employeeId =
-    //     Provider.of<EmployeesProvider>(context, listen: false).getEmployee.id;
-    final employeeId = '615433e84dc54f00040af177';
+    final employeeId =
+        Provider.of<EmployeesProvider>(context, listen: false).getEmployee.id;
+    //final employeeId = '6160912d9ddfb800041e6fd5';
 
     // String name =
     //     '${Provider.of<EmployeesProvider>(context, listen: false).getEmployee.firstName} ${Provider.of<EmployeesProvider>(context, listen: false).getEmployee.lastName} ';
@@ -135,12 +134,14 @@ class _EmployeeBookedInfoState extends State<EmployeeBookedInfo> {
   void _fetchData() async {
     print('visiId=${widget.visitorId}');
     final url = Uri.parse(
-        'https://pure-woodland-42301.herokuapp.com/api/visitor/usersProfile/6160912d9ddfb800041e6fd5');
+        'https://pure-woodland-42301.herokuapp.com/api/visitor/usersProfile/${widget.visitorId}');
     try {
       final response = await http.get(url);
-      print('body=${response.body}');
+      print('visitorBody=${response.body}');
       if (response.statusCode == 200) {
         responseData = jsonDecode(response.body)['user'];
+        // print('fName=${responseData['firstName']}');
+        // print('lName=${responseData['lastName']}');
         setState(() {
           _isLoading = false;
         });
@@ -188,17 +189,26 @@ class _EmployeeBookedInfoState extends State<EmployeeBookedInfo> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        '${responseData['firstName'].toString()} ${responseData['lastName'].toString()}'
-                            .capitalizeFirstofEach,
+                        '${responseData['firstName'].toString()} ${responseData['lastName'].toString()}',
                         style: TextStyle(
                           color: Colors.black,
                           fontSize: 18,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
+                      SizedBox(
+                        height: 10,
+                      ),
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
+                          Icon(
+                            Icons.calendar_today,
+                            color: Colors.black,
+                            size: 20,
+                          ),
+                          SizedBox(
+                            width: 5,
+                          ),
                           Text(
                             DateFormat.yMMMMd('en_US').format(widget.date),
                             style: TextStyle(
@@ -207,7 +217,22 @@ class _EmployeeBookedInfoState extends State<EmployeeBookedInfo> {
                                 fontWeight: FontWeight.bold),
                           ),
                           SizedBox(
-                            width: 30,
+                            width: 10,
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.timer,
+                            color: Colors.black,
+                            size: 20,
+                          ),
+                          SizedBox(
+                            width: 5,
                           ),
                           Text(
                             widget.timeSlot,
@@ -244,6 +269,7 @@ class _EmployeeBookedInfoState extends State<EmployeeBookedInfo> {
                   )
                 ],
               ),
-            ));
+            ),
+          );
   }
 }

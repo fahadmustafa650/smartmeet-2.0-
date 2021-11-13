@@ -175,7 +175,18 @@ class _OtpScreenState extends State<OtpScreen> {
       userOTP: otpCode,
     );
     if (timeValue <= 0) {
-      print('Time Passed');
+      Fluttertoast.showToast(
+        msg: "Time Passed Resend Code",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.black54,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+      setState(() {
+        _isLoading = false;
+      });
       return;
     }
     if (result) {
@@ -198,7 +209,7 @@ class _OtpScreenState extends State<OtpScreen> {
   }
 
   void addData() async {
-    await widget.addAllData();
+    widget.addAllData(context);
     setState(() {
       _isLoading = false;
     });

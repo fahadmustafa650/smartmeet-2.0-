@@ -46,7 +46,7 @@ class VisitorAcceptedAppointmentRequestsProvider with ChangeNotifier {
       }
       notifyListeners();
     } catch (error) {
-      print('errorOccured=$error');
+      //print('errorOccured=$error');
       throw error;
     }
   }

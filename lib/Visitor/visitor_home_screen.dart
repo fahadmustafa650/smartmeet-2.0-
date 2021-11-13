@@ -33,11 +33,13 @@ class _VisitorHomeScreenState extends State<VisitorHomeScreen> {
     //successMessage();
 
     _isInit = true;
+    // _isInit = false;
   }
 
   @override
   void didChangeDependencies() async {
     super.didChangeDependencies();
+
     if (_isInit &&
         Provider.of<VisitorProvider>(context).getVisitor.id == null) {
       //await Provider.of<Visitors>(context).getVisitorData(args['email']);
@@ -244,8 +246,8 @@ class _VisitorHomeScreenState extends State<VisitorHomeScreen> {
     }
   }
 
-  void clearLoginData() async {
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-    await preferences.clear();
-  }
+  // void clearLoginData() async {
+  //   SharedPreferences preferences = await SharedPreferences.getInstance();
+  //   await preferences.clear();
+  // }
 }

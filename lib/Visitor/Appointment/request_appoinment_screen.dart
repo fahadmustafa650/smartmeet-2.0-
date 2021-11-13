@@ -7,7 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:smart_meet/providers/visitor_provider.dart';
 import 'appointment_sent_screen.dart';
-import 'reserve_spot_employee_screen.dart';
+// import 'reserve_spot_employee_screen.dart';
 import 'package:http/http.dart' as http;
 
 class RequestAppointmentScreen extends StatefulWidget {
@@ -44,22 +44,22 @@ class _RequestAppointmentScreenState extends State<RequestAppointmentScreen> {
     // String visitorId = '61292ccba64b18000460842a';
     final visitorData =
         Provider.of<VisitorProvider>(context, listen: false).getVisitor;
-    String visitorId = visitorData.id;
+    String _visitorId = visitorData.id;
     String visitorName = '${visitorData.firstName} ${visitorData.lastName}';
 
     final routeArgs =
         ModalRoute.of(context).settings.arguments as Map<String, String>;
-    String employeeId = routeArgs['employeeId'];
+    String _employeeId = routeArgs['employeeId'];
     setState(() {});
-    print('empId=$employeeId');
+    print('empId=$_employeeId');
     final url = Uri.parse(
         'https://pure-woodland-42301.herokuapp.com/api/visitor/appointment');
-    print('employeeId=$employeeId');
-    print('visitorId=$visitorId');
-    print('_companyController=${_companyController.text}');
-    print('_visitorReasonField=${_visitorReasonField.text}');
-    print('timeSlot=$selectedStartTime-$selectedEndTime');
-    print('Date=${selectedDate.toString()}');
+    // print('employeeId=$employeeId');
+    // print('visitorId=$visitorId');
+    // print('_companyController=${_companyController.text}');
+    // print('_visitorReasonField=${_visitorReasonField.text}');
+    // print('timeSlot=$selectedStartTime-$selectedEndTime');
+    // print('Date=${selectedDate.toString()}');
 
     final response = await http.post(
       url,
@@ -67,11 +67,11 @@ class _RequestAppointmentScreenState extends State<RequestAppointmentScreen> {
         'Content-Type': 'application/json',
       },
       body: jsonEncode(<String, String>{
-        'employeeId': employeeId,
-        'VisitorId': visitorId,
+        'employeeId': _employeeId,
+        'VisitorId': _visitorId,
         'CompanyName': _companyController.text.toString(),
         'Message': _visitorReasonField.text.toString(),
-        'Timeslot': '$selectedStartTime:$selectedEndTime',
+        'Timeslot': '$selectedStartTime-$selectedEndTime',
         'Date': selectedDate.toString(),
       }),
     );
@@ -109,9 +109,25 @@ class _RequestAppointmentScreenState extends State<RequestAppointmentScreen> {
     );
     if (_selectedTime24Hour != null) {
       setState(() {
-        selectedStartTime =
-            '${_selectedTime24Hour.hour}:${_selectedTime24Hour.minute}';
-        print('selectedStartTime=$selectedStartTime');
+        DateTime now = DateTime.now();
+        if (_selectedTime24Hour.hour >= now.hour &&
+            _selectedTime24Hour.minute >= now.minute) {
+          selectedStartTime =
+              '${_selectedTime24Hour.hour}:${_selectedTime24Hour.minute}';
+          return;
+        } else if (_selectedTime24Hour.hour < now.hour) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content:
+                Text("Selected Time must not be previous than Current Time"),
+            duration: Duration(milliseconds: 500),
+          ));
+          return;
+          //print('Time is not after');
+        }
+        // now.isAfter();
+        // print('nowHour=${now.hour}');
+        // print('newMint=${now.minute}');
+        //print('selectedStartTime=$selectedStartTime');
       });
     }
   }
@@ -129,12 +145,30 @@ class _RequestAppointmentScreenState extends State<RequestAppointmentScreen> {
     );
     if (_selectedTime24Hour != null) {
       setState(() {
-        selectedEndTime =
-            '${_selectedTime24Hour.hour}-${_selectedTime24Hour.minute}';
-        print('selectedEndTime=$selectedEndTime');
+        // final f =  DateFormat.yMMMMd('en_US').format(DateTime.parse(selectedStartTime));
+        if (selectedStartTime != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text("Select Starting Time First"),
+              duration: Duration(milliseconds: 500),
+            ),
+          );
+          // print('Select Starting Time First');
+        } else if (!(DateTime.parse(selectedStartTime)
+            .isBefore(DateTime.parse(selectedEndTime)))) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text("End Time must not before Start Time"),
+              duration: Duration(milliseconds: 500),
+            ),
+          );
+        }
+
+        //  selectedEndTime =
+        // '${_selectedTime24Hour.hour}-${_selectedTime24Hour.minute}';
+        // print('selectedEndTime=$selectedEndTime');
       });
     }
-    //selectedTime24Hour.
   }
 
   @override
@@ -199,34 +233,7 @@ class _RequestAppointmentScreenState extends State<RequestAppointmentScreen> {
               SizedBox(
                 height: 5,
               ),
-              GestureDetector(
-                onTap: () {
-                  _selectDate(context);
-                },
-                child: Container(
-                  // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  width: MediaQuery.of(context).size.width * 0.55,
-                  height: 45,
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      color: Colors.white,
-                      border: Border.all(color: Colors.grey, width: 1)),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Text(
-                          selectedDate == null
-                              ? 'Select Date'
-                              : DateFormat.yMMMMd('en_US').format(selectedDate),
-                          style: TextStyle(color: Colors.grey, fontSize: 18)),
-                      Icon(
-                        Icons.calendar_today,
-                        color: Colors.grey,
-                      )
-                    ],
-                  ),
-                ),
-              ),
+              _selectDateBtn(context),
               SizedBox(
                 height: 10,
               ),
@@ -235,75 +242,17 @@ class _RequestAppointmentScreenState extends State<RequestAppointmentScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    GestureDetector(
-                      onTap: () {
-                        _selectStartTime(context);
-                      },
-                      child: Container(
-                        // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                        width: MediaQuery.of(context).size.width * 0.4,
-                        height: 45,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20),
-                            color: Colors.white,
-                            border: Border.all(color: Colors.grey, width: 1)),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            Text(
-                              selectedStartTime == null
-                                  ? 'Start Time'
-                                  : selectedStartTime,
-                              style:
-                                  TextStyle(color: Colors.grey, fontSize: 18),
-                            ),
-                            Icon(
-                              FontAwesomeIcons.clock,
-                              color: Colors.grey,
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        _selectEndTime(context);
-                      },
-                      child: Container(
-                        // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                        width: MediaQuery.of(context).size.width * 0.4,
-                        height: 45,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20),
-                            color: Colors.white,
-                            border: Border.all(color: Colors.grey, width: 1)),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            Text(
-                              selectedEndTime == null
-                                  ? 'End Time'
-                                  : selectedEndTime,
-                              style:
-                                  TextStyle(color: Colors.grey, fontSize: 18),
-                            ),
-                            Icon(
-                              FontAwesomeIcons.clock,
-                              color: Colors.grey,
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
+                    startTimeBtn(context),
+                    _endTimeBtn(context),
                   ],
                 ),
               ),
               SizedBox(
                 height: 5,
               ),
-              companyNameField(),
-              visitReasonField(),
-              requestAppointmentBtn(context)
+              _companyNameField(),
+              _visitReasonField(),
+              _requestAppointmentBtn(context)
             ],
           ),
         ),
@@ -311,7 +260,98 @@ class _RequestAppointmentScreenState extends State<RequestAppointmentScreen> {
     );
   }
 
-  GestureDetector requestAppointmentBtn(BuildContext context) {
+  GestureDetector _selectDateBtn(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        _selectDate(context);
+      },
+      child: Container(
+        // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        width: MediaQuery.of(context).size.width * 0.55,
+        height: 45,
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            color: Colors.white,
+            border: Border.all(color: Colors.grey, width: 1)),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Text(
+                selectedDate == null
+                    ? 'Select Date'
+                    : DateFormat.yMMMMd('en_US').format(selectedDate),
+                style: TextStyle(color: Colors.grey, fontSize: 18)),
+            Icon(
+              Icons.calendar_today,
+              color: Colors.grey,
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  GestureDetector startTimeBtn(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        _selectStartTime(context);
+      },
+      child: Container(
+        // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        width: MediaQuery.of(context).size.width * 0.4,
+        height: 45,
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            color: Colors.white,
+            border: Border.all(color: Colors.grey, width: 1)),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Text(
+              selectedStartTime == null ? 'Start Time' : selectedStartTime,
+              style: TextStyle(color: Colors.grey, fontSize: 18),
+            ),
+            Icon(
+              FontAwesomeIcons.clock,
+              color: Colors.grey,
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  GestureDetector _endTimeBtn(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        _selectEndTime(context);
+      },
+      child: Container(
+        // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        width: MediaQuery.of(context).size.width * 0.4,
+        height: 45,
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            color: Colors.white,
+            border: Border.all(color: Colors.grey, width: 1)),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Text(
+              selectedEndTime == null ? 'End Time' : selectedEndTime,
+              style: TextStyle(color: Colors.grey, fontSize: 18),
+            ),
+            Icon(
+              FontAwesomeIcons.clock,
+              color: Colors.grey,
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  GestureDetector _requestAppointmentBtn(BuildContext context) {
     return GestureDetector(
       onTap: () {
         postData();
@@ -335,7 +375,7 @@ class _RequestAppointmentScreenState extends State<RequestAppointmentScreen> {
     );
   }
 
-  Container visitReasonField() {
+  Container _visitReasonField() {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       decoration: BoxDecoration(
@@ -363,7 +403,7 @@ class _RequestAppointmentScreenState extends State<RequestAppointmentScreen> {
     );
   }
 
-  Container companyNameField() {
+  Container _companyNameField() {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       decoration: BoxDecoration(

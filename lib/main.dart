@@ -30,6 +30,7 @@ import 'Visitor/Visitor Verification Steps/qr_code_step1.dart';
 import 'Visitor/VisitorForgetPassword/visitor_enter_email_screen.dart';
 import 'Visitor/visitor_home_screen.dart';
 import 'providers/employee_booked_appointment_provider.dart';
+import 'providers/employee_office_location_provider.dart';
 import 'providers/employee_pending_appointments_provider.dart';
 import 'providers/employee_auth.dart';
 import 'providers/employee_provider.dart';
@@ -39,6 +40,7 @@ import 'screens/chat_screen.dart';
 import 'screens/chating_screen.dart';
 import 'screens/contact_us.dart';
 import 'screens/edit_profile_screen.dart';
+import 'screens/google_map_search_test.dart';
 import 'screens/login_as_screen.dart';
 import 'Employee/employee_screens/employee_pending_appointments_screen.dart';
 import 'screens/map_screen.dart';
@@ -102,10 +104,13 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider.value(
           value: EmployeeBookedAppointmentsProvider(),
         ),
+        ChangeNotifierProvider.value(
+          value: EmployeeOfficeLocationProvider(),
+        ),
       ],
       child: MaterialApp(
         debugShowMaterialGrid: false,
-        home: EmployeePendingAppointmentsScreen(),
+        home: MapSample(),
         // initialRoute: RequestAppointmentScreen.id,
         debugShowCheckedModeBanner: false,
         routes: {
@@ -120,7 +125,6 @@ class MyApp extends StatelessWidget {
           EditProfileScreen.id: (context) => EditProfileScreen(),
           EmployeeSearchBar.id: (context) => EmployeeSearchBar(),
           EmployeeHomeScreen.id: (context) => EmployeeHomeScreen(),
-          EmployeeSignInScreen.id: (context) => EmployeeSignInScreen(),
           EmployeeSignUpScreen.id: (context) => EmployeeSignUpScreen(),
           EmployeeEditProfileScreen.id: (context) =>
               EmployeeEditProfileScreen(),
@@ -128,8 +132,6 @@ class MyApp extends StatelessWidget {
               EmployeeBookedAppointmentsScreen(),
           EmployeePendingAppointmentsScreen.id: (context) =>
               EmployeePendingAppointmentsScreen(),
-          EmployeeNewPasswordScreen.id: (context) =>
-              EmployeeNewPasswordScreen(),
           VisitorEnterEmailScreen.id: (context) => VisitorEnterEmailScreen(),
           EmployeeEnterEmailScreen.id: (context) => EmployeeEnterEmailScreen(),
           FacialRecognitionStep3.id: (context) => FacialRecognitionStep3(),
@@ -142,13 +144,13 @@ class MyApp extends StatelessWidget {
               ReserveEmployeeSpotScreen(),
           ScanQRCodeStep1.id: (context) => ScanQRCodeStep1(),
           SignUpAsScreen.id: (context) => SignUpAsScreen(),
-          PasswordChangedSuccess.id: (context) => PasswordChangedSuccess(),
+          //PasswordChangedSuccess.id: (context) => PasswordChangedSuccess(),
           TemperatureDetectionStep3.id: (context) =>
               TemperatureDetectionStep3(),
           VisitorHomeScreen.id: (context) => VisitorHomeScreen(),
           VisitorEditProfileScreen.id: (context) => VisitorEditProfileScreen(),
           VisitorEnterEmailScreen.id: (context) => VisitorEnterEmailScreen(),
-          VisitorSignInScreen.id: (context) => VisitorSignInScreen(),
+          //VisitorSignInScreen.id: (context) => VisitorSignInScreen(),
           VisitorSignUpScreen.id: (context) => VisitorSignUpScreen(),
           VisitorPendingAppointmentsScreen.id: (context) =>
               VisitorPendingAppointmentsScreen(),
@@ -223,17 +225,8 @@ class _TestScreenState extends State<TestScreen> {
         title: Text('App Title'),
       ),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-          ],
+        child: Text(
+          'You have pushed the button this many times: \n$_counter',
         ),
       ),
       floatingActionButton: FloatingActionButton(

@@ -38,8 +38,8 @@ dependencies:
   firebase_messaging: ^10.0.7
   flutter_local_notifications:
   flutter_spinkit: ^5.1.0
-  string_extensions: 
-
+  string_extensions:
+ 
 
 
 
