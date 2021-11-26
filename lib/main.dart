@@ -21,12 +21,13 @@ import 'Visitor/Appointment/search_employee_screen.dart';
 import 'Visitor/Appointment/visitor_booked_appointment_screen.dart';
 import 'Visitor/Appointment/search_result_screen.dart';
 import 'Visitor/Device steps/facial_recognition_step3.dart';
+import 'Visitor/Device steps/qr_code_step1.dart';
+import 'Visitor/Device steps/run_in_appointment_screen.dart';
 import 'Visitor/Device steps/temperature_detector_step2.dart';
 import 'Visitor/Visitor Authentication/visitor_edit_profile_screen.dart';
 import 'Visitor/Visitor Authentication/visitor_sign_in_screen.dart';
 import 'Visitor/Visitor Authentication/visitor_sign_up_screen.dart';
 import 'Visitor/Visitor Verification Steps/mask_detection_step4.dart';
-import 'Visitor/Visitor Verification Steps/qr_code_step1.dart';
 import 'Visitor/VisitorForgetPassword/visitor_enter_email_screen.dart';
 import 'Visitor/visitor_home_screen.dart';
 import 'providers/employee_booked_appointment_provider.dart';
@@ -66,11 +67,11 @@ const AndroidNotificationChannel channel = AndroidNotificationChannel(
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
 
-Future<void> _firebaseMessagingBackgroundHandler(
-    RemoteMessage remoteMessage) async {
-  await Firebase.initializeApp();
-  print('A bg message just showed up : ${remoteMessage.messageId}');
-}
+// Future<void> _firebaseMessagingBackgroundHandler(
+//     RemoteMessage remoteMessage) async {
+//   await Firebase.initializeApp();
+//   print('A bg message just showed up : ${remoteMessage.messageId}');
+// }
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -110,7 +111,7 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
         debugShowMaterialGrid: false,
-        home: MapSample(),
+        home: RunInAppointmentScreen(),
         // initialRoute: RequestAppointmentScreen.id,
         debugShowCheckedModeBanner: false,
         routes: {
@@ -142,7 +143,7 @@ class MyApp extends StatelessWidget {
           RequestAppointmentScreen.id: (context) => RequestAppointmentScreen(),
           ReserveEmployeeSpotScreen.id: (context) =>
               ReserveEmployeeSpotScreen(),
-          ScanQRCodeStep1.id: (context) => ScanQRCodeStep1(),
+          // ScanQRCodeStep1.id: (context) => ScanQRCodeStep1(),
           SignUpAsScreen.id: (context) => SignUpAsScreen(),
           //PasswordChangedSuccess.id: (context) => PasswordChangedSuccess(),
           TemperatureDetectionStep3.id: (context) =>

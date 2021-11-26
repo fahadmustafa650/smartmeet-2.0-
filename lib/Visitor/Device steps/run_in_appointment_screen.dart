@@ -3,49 +3,41 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:date_time_picker/date_time_picker.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:smart_meet/Visitor/Appointment/appointment_sent_screen.dart';
 import 'package:smart_meet/providers/visitor_provider.dart';
-import 'appointment_sent_screen.dart';
 // import 'reserve_spot_employee_screen.dart';
+import 'dart:io' as io;
 import 'package:http/http.dart' as http;
 
-class RequestAppointmentScreen extends StatefulWidget {
-  static final id = '/request_appoinment_screen';
+class RunInAppointmentScreen extends StatefulWidget {
+  static final id = '/run_in_appoinment_screen';
   @override
-  _RequestAppointmentScreenState createState() =>
-      _RequestAppointmentScreenState();
+  _RunInAppointmentScreenState createState() => _RunInAppointmentScreenState();
 }
 
-class _RequestAppointmentScreenState extends State<RequestAppointmentScreen> {
-  final name = '';
-  var _nameController;
+class _RunInAppointmentScreenState extends State<RunInAppointmentScreen> {
+  // final name = '';
+
+  final _firstNameController = TextEditingController();
+  final _lastNameController = TextEditingController();
   final _companyController = TextEditingController();
   //final _messageController = TextEditingController();
   final _visitorReasonField = TextEditingController();
-  DateTime selectedDate = DateTime.now();
-  String selectedStartTime;
-  String selectedEndTime;
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    // Future.delayed(Duration.zero).then((_) {
-    //   final visitorData =
-    //       Provider.of<VisitorProvider>(context, listen: false).getVisitor;
-    //   String visitorName = '${visitorData.firstName} ${visitorData.lastName}';
-    //   _nameController = TextEditingController(text: visitorName);
-    // });
-  }
-
+  DateTime _selectedDate = DateTime.now();
+  String _selectedStartTime;
+  String _selectedEndTime;
+  String profilePicError = '';
+  //file
+  io.File _image;
   void postData() async {
     //Logged In Visitor Id will be entered
     // String visitorId = '61292ccba64b18000460842a';
     final visitorData =
         Provider.of<VisitorProvider>(context, listen: false).getVisitor;
     String _visitorId = visitorData.id;
-    String visitorName = '${visitorData.firstName} ${visitorData.lastName}';
 
     final routeArgs =
         ModalRoute.of(context).settings.arguments as Map<String, String>;
@@ -71,8 +63,8 @@ class _RequestAppointmentScreenState extends State<RequestAppointmentScreen> {
         'VisitorId': _visitorId,
         'CompanyName': _companyController.text.toString(),
         'Message': _visitorReasonField.text.toString(),
-        'Timeslot': '$selectedStartTime-$selectedEndTime',
-        'Date': selectedDate.toString(),
+        'Timeslot': '$_selectedStartTime-$_selectedEndTime',
+        'Date': _selectedDate.toString(),
       }),
     );
     //print(jsonDecode(response.body)['error']);
@@ -85,14 +77,23 @@ class _RequestAppointmentScreenState extends State<RequestAppointmentScreen> {
   Future<void> _selectDate(BuildContext context) async {
     final DateTime picked = await showDatePicker(
         context: context,
-        initialDate: selectedDate,
+        initialDate: _selectedDate,
         firstDate: DateTime.now(),
         lastDate: DateTime(2101));
-    if (picked != null && picked != selectedDate) {
+    if (picked != null && picked != _selectedDate) {
       setState(() {
-        selectedDate = picked;
+        _selectedDate = picked;
       });
     }
+  }
+
+  void _imgFromCamera() async {
+    final ImagePicker _picker = ImagePicker();
+    final image = await _picker.pickImage(source: ImageSource.camera);
+    setState(() {
+      _image = io.File(image.path);
+      profilePicError = '';
+    });
   }
 
   // ignore: missing_return
@@ -112,22 +113,27 @@ class _RequestAppointmentScreenState extends State<RequestAppointmentScreen> {
         DateTime now = DateTime.now();
         if (_selectedTime24Hour.hour >= now.hour &&
             _selectedTime24Hour.minute >= now.minute) {
-          selectedStartTime =
-              '${_selectedTime24Hour.hour}:${_selectedTime24Hour.minute}';
+          setState(() {
+            _selectedStartTime =
+                '${_selectedTime24Hour.hour}:${_selectedTime24Hour.minute}';
+          });
+
           return;
         } else if (_selectedTime24Hour.hour < now.hour) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content:
-                Text("Selected Time must not be previous than Current Time"),
-            duration: Duration(milliseconds: 500),
-          ));
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content:
+                  Text("Selected Time must not be previous than Current Time"),
+              duration: Duration(milliseconds: 2000),
+            ),
+          );
           return;
           //print('Time is not after');
         }
         // now.isAfter();
         // print('nowHour=${now.hour}');
         // print('newMint=${now.minute}');
-        //print('selectedStartTime=$selectedStartTime');
+        // print('selectedStartTime=$selectedStartTime');
       });
     }
   }
@@ -146,7 +152,7 @@ class _RequestAppointmentScreenState extends State<RequestAppointmentScreen> {
     if (_selectedTime24Hour != null) {
       setState(() {
         // final f =  DateFormat.yMMMMd('en_US').format(DateTime.parse(selectedStartTime));
-        if (selectedStartTime != null) {
+        if (_selectedStartTime == null) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text("Select Starting Time First"),
@@ -154,19 +160,21 @@ class _RequestAppointmentScreenState extends State<RequestAppointmentScreen> {
             ),
           );
           // print('Select Starting Time First');
-        } else if (!(DateTime.parse(selectedStartTime)
-            .isBefore(DateTime.parse(selectedEndTime)))) {
+        } else if (!(DateTime.parse(_selectedStartTime)
+            .isBefore(DateTime.parse(_selectedEndTime)))) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text("End Time must not before Start Time"),
-              duration: Duration(milliseconds: 500),
+              duration: Duration(milliseconds: 2000),
             ),
           );
+        } else {
+          setState(() {
+            _selectedEndTime =
+                '${_selectedTime24Hour.hour}:${_selectedTime24Hour.minute}';
+            print('endtime=$_selectedEndTime');
+          });
         }
-
-        //  selectedEndTime =
-        // '${_selectedTime24Hour.hour}-${_selectedTime24Hour.minute}';
-        // print('selectedEndTime=$selectedEndTime');
       });
     }
   }
@@ -189,10 +197,7 @@ class _RequestAppointmentScreenState extends State<RequestAppointmentScreen> {
         title: Text(
           'Request Appoinment',
           style: TextStyle(
-            color: Colors.white,
-            fontSize: 25,
-            fontWeight: FontWeight.bold,
-          ),
+              color: Colors.white, fontSize: 25, fontWeight: FontWeight.bold),
         ),
         backgroundColor: Colors.lightBlue,
       ),
@@ -204,39 +209,113 @@ class _RequestAppointmentScreenState extends State<RequestAppointmentScreen> {
               SizedBox(
                 height: 10,
               ),
-              Container(
-                margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  color: Colors.white,
-                ),
-                child: TextFormField(
-                  controller: _nameController,
-                  decoration: InputDecoration(
-                      labelText: 'Name',
-                      contentPadding: EdgeInsets.only(left: 10),
-                      border: InputBorder.none,
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(25.0),
-                        borderSide: BorderSide(
-                          color: Colors.grey,
-                          width: 1.0,
+              Center(
+                child: GestureDetector(
+                  onTap: () {
+                    _imgFromCamera();
+                    Navigator.pop(context);
+                  },
+                  child: Container(
+                    width: 128,
+                    height: 128,
+                    child: Stack(
+                      children: <Widget>[
+                        Align(
+                          alignment: Alignment.topRight,
+                          child: GestureDetector(
+                            onTap: () {},
+                            child: Icon(
+                              Icons.camera_alt,
+                              size: 25,
+                            ),
+                          ),
                         ),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(25.0),
-                        borderSide: BorderSide(
-                          color: Colors.grey,
-                          width: 1.0,
+                        CircleAvatar(
+                          radius: 128,
+                          backgroundColor: Colors.transparent,
+                          backgroundImage: _image != null
+                              ? FileImage(_image)
+                              : AssetImage('assets/images/blank_pic.jpg'),
                         ),
-                      ),
-                      labelStyle: TextStyle(color: Colors.grey, fontSize: 18)),
+                      ],
+                    ),
+                  ),
                 ),
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      margin:
+                          EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        color: Colors.white,
+                      ),
+                      child: TextFormField(
+                        controller: _firstNameController,
+                        decoration: InputDecoration(
+                            labelText: 'First Name',
+                            contentPadding: EdgeInsets.only(left: 10),
+                            border: InputBorder.none,
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(20),
+                              borderSide: BorderSide(
+                                color: Colors.lightBlue,
+                                width: 2,
+                              ),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(25.0),
+                              borderSide: BorderSide(
+                                color: Colors.grey,
+                                width: 1.0,
+                              ),
+                            ),
+                            labelStyle:
+                                TextStyle(color: Colors.grey, fontSize: 18)),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: Container(
+                      margin:
+                          EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        color: Colors.white,
+                      ),
+                      child: TextFormField(
+                        controller: _lastNameController,
+                        decoration: InputDecoration(
+                            labelText: 'Last Name',
+                            contentPadding: EdgeInsets.only(left: 10),
+                            border: InputBorder.none,
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(20),
+                              borderSide: BorderSide(
+                                color: Colors.lightBlue,
+                                width: 2,
+                              ),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(25.0),
+                              borderSide: BorderSide(
+                                color: Colors.grey,
+                                width: 1.0,
+                              ),
+                            ),
+                            labelStyle:
+                                TextStyle(color: Colors.grey, fontSize: 18)),
+                      ),
+                    ),
+                  )
+                ],
               ),
               SizedBox(
                 height: 5,
               ),
-              _selectDateBtn(context),
+              _emailTextField(),
               SizedBox(
                 height: 10,
               ),
@@ -280,9 +359,9 @@ class _RequestAppointmentScreenState extends State<RequestAppointmentScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             Text(
-                selectedDate == null
+                _selectedDate == null
                     ? 'Select Date'
-                    : DateFormat.yMMMMd('en_US').format(selectedDate),
+                    : DateFormat.yMMMMd('en_US').format(_selectedDate),
                 style: TextStyle(color: Colors.grey, fontSize: 18)),
             Icon(
               Icons.calendar_today,
@@ -311,7 +390,7 @@ class _RequestAppointmentScreenState extends State<RequestAppointmentScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             Text(
-              selectedStartTime == null ? 'Start Time' : selectedStartTime,
+              _selectedStartTime == null ? 'Start Time' : _selectedStartTime,
               style: TextStyle(color: Colors.grey, fontSize: 18),
             ),
             Icon(
@@ -341,7 +420,7 @@ class _RequestAppointmentScreenState extends State<RequestAppointmentScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             Text(
-              selectedEndTime == null ? 'End Time' : selectedEndTime,
+              _selectedEndTime == null ? 'End Time' : _selectedEndTime,
               style: TextStyle(color: Colors.grey, fontSize: 18),
             ),
             Icon(
@@ -393,6 +472,13 @@ class _RequestAppointmentScreenState extends State<RequestAppointmentScreen> {
             hintText:
                 'In order to better serve you please let us know your reason to visit',
             contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(25.0),
+              borderSide: BorderSide(
+                color: Colors.grey,
+                width: 1.0,
+              ),
+            ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(25.0),
               borderSide: BorderSide(
@@ -419,6 +505,45 @@ class _RequestAppointmentScreenState extends State<RequestAppointmentScreen> {
             labelText: 'Company name (Optional)',
             contentPadding: EdgeInsets.only(left: 10),
             border: InputBorder.none,
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(25.0),
+              borderSide: BorderSide(
+                color: Colors.grey,
+                width: 1.0,
+              ),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(25.0),
+              borderSide: BorderSide(
+                color: Colors.grey,
+                width: 1.0,
+              ),
+            ),
+            labelStyle: TextStyle(color: Colors.grey, fontSize: 18)),
+      ),
+    );
+  }
+
+  Container _emailTextField() {
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        color: Colors.white,
+      ),
+      child: TextFormField(
+        controller: _companyController,
+        decoration: InputDecoration(
+            labelText: 'Email',
+            contentPadding: EdgeInsets.only(left: 10),
+            border: InputBorder.none,
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(25.0),
+              borderSide: BorderSide(
+                color: Colors.grey,
+                width: 1.0,
+              ),
+            ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(25.0),
               borderSide: BorderSide(

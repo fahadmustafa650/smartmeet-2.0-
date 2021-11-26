@@ -28,7 +28,7 @@ class _MapScreenState extends State<MapScreen> {
   Position currentPosition;
   var geolocator = Geolocator();
 
-  void locatePosition() async {
+  void locatePosition(BuildContext ctx) async {
     Position position = await Geolocator.getCurrentPosition(
       desiredAccuracy: LocationAccuracy.high,
     );
@@ -38,6 +38,9 @@ class _MapScreenState extends State<MapScreen> {
       target: latLng,
       zoom: 14.4746,
     );
+    print('lat=${latLng.latitude}');
+    print('long=${latLng.longitude}');
+
     _googleMapController
         .animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
   }
@@ -48,7 +51,7 @@ class _MapScreenState extends State<MapScreen> {
     // TODO: implement initState
     super.initState();
     var _isInit = true;
-    locatePosition();
+    //locatePosition();
   }
 
   @override
@@ -124,7 +127,7 @@ class _MapScreenState extends State<MapScreen> {
             initialCameraPosition: _initialCameraPosition,
             onMapCreated: (controller) {
               //_googleMapController = controller;
-              locatePosition();
+              locatePosition(context);
             },
             markers: {
               //if (_origin != null) _origin,
@@ -141,7 +144,7 @@ class _MapScreenState extends State<MapScreen> {
                       .toList(),
                 ),
             },
-            // onLongPress: _setDestination,
+            //onLongPress: _setDestination,
           ),
           if (_info != null)
             Positioned(

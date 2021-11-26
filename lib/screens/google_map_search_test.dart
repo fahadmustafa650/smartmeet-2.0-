@@ -1,14 +1,13 @@
 import 'dart:async';
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:smart_meet/providers/employee_office_location_provider.dart';
 import 'package:smart_meet/providers/employee_provider.dart';
-
-const mapApiKey = 'AIzaSyAofr6MTAVjER_EanHr_GFsMGzOcehOeUU';
+import 'package:smart_meet/Constants/constants.dart';
+// const mapApiKey = 'AIzaSyAofr6MTAVjER_EanHr_GFsMGzOcehOeUU';
 
 class MapSample extends StatefulWidget {
   final String employeeId;
@@ -119,7 +118,7 @@ class MapSampleState extends State<MapSample> {
             onPressed: () {
               //LatLng l = LatLng(34.4345345, 23.423423);
               employeeLocationData.saveLocation(
-                '6160912d9ddfb800041e6fd5',
+                employeeData.getEmployee.id,
                 _employeeOfficeMarker.position,
               );
             },
@@ -147,10 +146,10 @@ class MapSampleState extends State<MapSample> {
   //   controller.animateCamera(CameraUpdate.newCameraPosition(_kLake));
   // }
 
-  void saveLocation() {
-    final url = Uri.parse(
-        'https://pure-woodland-42301.herokuapp.com/api/employee_location');
-  }
+  // void saveLocation() {
+  //   final url = Uri.parse(
+  //       'https://pure-woodland-42301.herokuapp.com/api/employee_location');
+  // }
 
   void _addMarker(LatLng pos) async {
     // if (_origin == null || (_origin != null && _destination != null)) {

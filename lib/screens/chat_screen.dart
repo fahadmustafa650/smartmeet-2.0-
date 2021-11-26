@@ -15,11 +15,12 @@ class ChatScreen extends StatelessWidget {
           ),
           actions: [
             IconButton(
-                icon: Icon(
-                  Icons.search,
-                  color: Colors.white,
-                ),
-                onPressed: null)
+              icon: Icon(
+                Icons.search,
+                color: Colors.white,
+              ),
+              onPressed: null,
+            )
           ],
         ),
         body: SingleChildScrollView(
