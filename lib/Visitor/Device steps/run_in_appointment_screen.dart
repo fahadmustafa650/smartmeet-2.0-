@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:date_time_picker/date_time_picker.dart';
@@ -7,10 +8,12 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:smart_meet/Visitor/Appointment/appointment_sent_screen.dart';
+import 'package:smart_meet/api/firebase_api.dart';
 import 'package:smart_meet/providers/visitor_provider.dart';
 // import 'reserve_spot_employee_screen.dart';
 import 'dart:io' as io;
 import 'package:http/http.dart' as http;
+import 'package:path/path.dart';
 
 class RunInAppointmentScreen extends StatefulWidget {
   static final id = '/run_in_appoinment_screen';
@@ -23,77 +26,119 @@ class _RunInAppointmentScreenState extends State<RunInAppointmentScreen> {
 
   final _firstNameController = TextEditingController();
   final _lastNameController = TextEditingController();
+  final _emailController = TextEditingController();
   final _companyController = TextEditingController();
   //final _messageController = TextEditingController();
   final _visitorReasonField = TextEditingController();
-  DateTime _selectedDate = DateTime.now();
+  //DateTime _selectedDate = DateTime.now();
+  var _isLoading = false;
   String _selectedStartTime;
   String _selectedEndTime;
   String profilePicError = '';
+  var _selectedStartTime24Hour;
+  UploadTask task;
+  String _imageUrl;
   //file
   io.File _image;
-  void postData() async {
+  void postData(BuildContext context) async {
     //Logged In Visitor Id will be entered
     // String visitorId = '61292ccba64b18000460842a';
-    final visitorData =
-        Provider.of<VisitorProvider>(context, listen: false).getVisitor;
-    String _visitorId = visitorData.id;
+    // final visitorData =
+    //     Provider.of<VisitorProvider>(context, listen: false).getVisitor;
+    // String _visitorId = visitorData.id;
 
     final routeArgs =
         ModalRoute.of(context).settings.arguments as Map<String, String>;
-    String _employeeId = routeArgs['employeeId'];
+    //String _employeeId = routeArgs['employeeId'];
+    // 6160912d9ddfb800041e6fd5
+    String _employeeId = '6160912d9ddfb800041e6fd5';
+    print('empId=${_employeeId}');
+    print('visitorId=${_emailController.text.toString()}');
+    print('startTime=${_selectedStartTime}');
+    print('endTime=${_selectedEndTime}');
+    print('reason=${_visitorReasonField.text.toString()}');
+    print('image=$_imageUrl');
+    print('firstName=${_firstNameController.text.toString()}');
+    print('lastName=${_lastNameController.text.toString()}');
+    print('company=${_companyController.text.toString()}');
+    print('message=${_visitorReasonField.text.toString()}');
+
     setState(() {});
-    print('empId=$_employeeId');
-    final url = Uri.parse(
-        'https://pure-woodland-42301.herokuapp.com/api/visitor/appointment');
-    // print('employeeId=$employeeId');
-    // print('visitorId=$visitorId');
-    // print('_companyController=${_companyController.text}');
-    // print('_visitorReasonField=${_visitorReasonField.text}');
-    // print('timeSlot=$selectedStartTime-$selectedEndTime');
-    // print('Date=${selectedDate.toString()}');
-
-    final response = await http.post(
-      url,
-      headers: <String, String>{
-        'Content-Type': 'application/json',
-      },
-      body: jsonEncode(<String, String>{
-        'employeeId': _employeeId,
-        'VisitorId': _visitorId,
-        'CompanyName': _companyController.text.toString(),
-        'Message': _visitorReasonField.text.toString(),
-        'Timeslot': '$_selectedStartTime-$_selectedEndTime',
-        'Date': _selectedDate.toString(),
-      }),
-    );
-    //print(jsonDecode(response.body)['error']);
-    if (response.statusCode == 200) {
-      print('appointmentSent=${response.statusCode}');
-      Navigator.pushNamed(context, AppointmentSentScreen.id);
-    }
-  }
-
-  Future<void> _selectDate(BuildContext context) async {
-    final DateTime picked = await showDatePicker(
-        context: context,
-        initialDate: _selectedDate,
-        firstDate: DateTime.now(),
-        lastDate: DateTime(2101));
-    if (picked != null && picked != _selectedDate) {
+    await _uploadFile().then((value) async {
+      final url = Uri.parse(
+          'https://pure-woodland-42301.herokuapp.com/api/visitor/runInappointment');
       setState(() {
-        _selectedDate = picked;
+        _isLoading = true;
       });
-    }
+      try {
+        final response = await http.post(
+          url,
+          headers: <String, String>{
+            'Content-Type': 'application/json',
+          },
+          body: jsonEncode(
+            <String, String>{
+              'employeeId': _employeeId,
+              'visitorEmail': _emailController.text.toString(),
+              'visitorName':
+                  '${_firstNameController.text.toString()} ${_lastNameController.text.toString()}',
+              'avatar': _imageUrl,
+              'visitorPhone': '3247234692348',
+              'companyName': _companyController.text.toString(),
+              'message': _visitorReasonField.text.toString(),
+              'timeslot': '$_selectedStartTime-$_selectedEndTime',
+              'date': DateTime.now().toString(),
+            },
+          ),
+        );
+        //print(jsonDecode(response.body)['error']);
+        print('appountmentCode=${response.statusCode}');
+        if (response.statusCode == 200) {
+          setState(() {
+            _isLoading = false;
+          });
+          print('appointmentSent=${response.statusCode}');
+          Navigator.pushNamed(context, AppointmentSentScreen.id);
+        } else {
+          setState(() {
+            _isLoading = false;
+          });
+        }
+      } catch (e) {
+        print(e);
+        throw e;
+      }
+    });
+    print('empId=$_employeeId');
   }
 
   void _imgFromCamera() async {
     final ImagePicker _picker = ImagePicker();
-    final image = await _picker.pickImage(source: ImageSource.camera);
-    setState(() {
-      _image = io.File(image.path);
-      profilePicError = '';
+    await _picker.pickImage(source: ImageSource.camera).then((value) {
+      setState(() {
+        _image = io.File(value.path);
+        // profilePicError = '';
+      });
     });
+  }
+
+  Future<void> _uploadFile() async {
+    if (_image == null) return;
+    final fileName = basename(_image.path);
+    final destination = 'files/$fileName';
+    try {
+      task = FirebaseApi.uploadFile(destination, _image);
+    } catch (error) {
+      print(error);
+    }
+
+    setState(() {});
+    if (task == null) return;
+    final snapshot = await task.whenComplete(() {});
+    final urlDownload = await snapshot.ref.getDownloadURL();
+    _imageUrl = urlDownload;
+    setState(() {});
+    // print('Download-Link: $urlDownload');
   }
 
   // ignore: missing_return
@@ -116,6 +161,7 @@ class _RunInAppointmentScreenState extends State<RunInAppointmentScreen> {
           setState(() {
             _selectedStartTime =
                 '${_selectedTime24Hour.hour}:${_selectedTime24Hour.minute}';
+            _selectedStartTime24Hour = _selectedTime24Hour;
           });
 
           return;
@@ -139,9 +185,19 @@ class _RunInAppointmentScreenState extends State<RunInAppointmentScreen> {
   }
 
   Future<void> _selectEndTime(BuildContext context) async {
+    if (_selectedStartTime == null) {
+      //_selectedEndTime = null;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Select Starting Time First"),
+          duration: Duration(milliseconds: 2000),
+        ),
+      );
+      return;
+    }
     final _selectedTime24Hour = await showTimePicker(
       context: context,
-      initialTime: const TimeOfDay(hour: 10, minute: 47),
+      initialTime: const TimeOfDay(hour: 12, minute: 0),
       builder: (BuildContext context, Widget child) {
         return MediaQuery(
           data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
@@ -149,33 +205,26 @@ class _RunInAppointmentScreenState extends State<RunInAppointmentScreen> {
         );
       },
     );
+    // print('24hourtime=$_selectedTime24Hour');
+    // print('Select Starting Time =$_selectedStartTime');
     if (_selectedTime24Hour != null) {
+      if (_selectedTime24Hour.hour < _selectedStartTime24Hour.hour ||
+          (_selectedTime24Hour == _selectedStartTime24Hour)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content:
+                Text("End Time must not be before/equal to  Starting Time"),
+            duration: Duration(milliseconds: 2000),
+          ),
+        );
+        return;
+      }
+      String _endTime =
+          '${_selectedTime24Hour.hour}:${_selectedTime24Hour.minute}';
       setState(() {
-        // final f =  DateFormat.yMMMMd('en_US').format(DateTime.parse(selectedStartTime));
-        if (_selectedStartTime == null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text("Select Starting Time First"),
-              duration: Duration(milliseconds: 500),
-            ),
-          );
-          // print('Select Starting Time First');
-        } else if (!(DateTime.parse(_selectedStartTime)
-            .isBefore(DateTime.parse(_selectedEndTime)))) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text("End Time must not before Start Time"),
-              duration: Duration(milliseconds: 2000),
-            ),
-          );
-        } else {
-          setState(() {
-            _selectedEndTime =
-                '${_selectedTime24Hour.hour}:${_selectedTime24Hour.minute}';
-            print('endtime=$_selectedEndTime');
-          });
-        }
+        _selectedEndTime = _endTime;
       });
+      //print('time24hour=$_endTime');
     }
   }
 
@@ -213,7 +262,7 @@ class _RunInAppointmentScreenState extends State<RunInAppointmentScreen> {
                 child: GestureDetector(
                   onTap: () {
                     _imgFromCamera();
-                    Navigator.pop(context);
+                    //Navigator.pop(context);
                   },
                   child: Container(
                     width: 128,
@@ -342,37 +391,6 @@ class _RunInAppointmentScreenState extends State<RunInAppointmentScreen> {
     );
   }
 
-  GestureDetector _selectDateBtn(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        _selectDate(context);
-      },
-      child: Container(
-        // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        width: MediaQuery.of(context).size.width * 0.55,
-        height: 45,
-        decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            color: Colors.white,
-            border: Border.all(color: Colors.grey, width: 1)),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Text(
-                _selectedDate == null
-                    ? 'Select Date'
-                    : DateFormat.yMMMMd('en_US').format(_selectedDate),
-                style: TextStyle(color: Colors.grey, fontSize: 18)),
-            Icon(
-              Icons.calendar_today,
-              color: Colors.grey,
-            )
-          ],
-        ),
-      ),
-    );
-  }
-
   GestureDetector _startTimeBtn(BuildContext context) {
     return GestureDetector(
       onTap: () {
@@ -436,7 +454,7 @@ class _RunInAppointmentScreenState extends State<RunInAppointmentScreen> {
   GestureDetector _requestAppointmentBtn(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        postData();
+        postData(context);
         //Navigator.pushNamed(context, AppointmentSentScreen.id);
       },
       child: Container(
@@ -446,13 +464,15 @@ class _RunInAppointmentScreenState extends State<RunInAppointmentScreen> {
           decoration: BoxDecoration(
               color: Colors.lightBlue, borderRadius: BorderRadius.circular(30)),
           child: Center(
-            child: Text(
-              'Request Appointment',
-              style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold),
-            ),
+            child: _isLoading
+                ? CircularProgressIndicator()
+                : Text(
+                    'Request Appointment',
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold),
+                  ),
           )),
     );
   }
@@ -532,7 +552,7 @@ class _RunInAppointmentScreenState extends State<RunInAppointmentScreen> {
         color: Colors.white,
       ),
       child: TextFormField(
-        controller: _companyController,
+        controller: _emailController,
         decoration: InputDecoration(
             labelText: 'Email',
             contentPadding: EdgeInsets.only(left: 10),
