@@ -1,17 +1,29 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+// import 'package:smart_meet/Constants/constants.dart';
 import 'package:smart_meet/models/appointment.dart';
 import 'package:smart_meet/providers/employee_pending_appointments_provider.dart';
 import 'package:smart_meet/providers/visitor_provider.dart';
 import 'package:http/http.dart' as http;
 
+final spinKitThreeBounce = SpinKitThreeBounce(
+  color: Colors.blue,
+  size: 10.0,
+);
+
 class VisitorAppointmentRequest extends StatefulWidget {
-  final Appointment visitorAppointmentRequestData;
-  const VisitorAppointmentRequest({this.visitorAppointmentRequestData});
+  final visitorAppointmentRequestData;
+  final bool isUrgent;
+  final int index;
+
+  const VisitorAppointmentRequest(
+      {this.visitorAppointmentRequestData, this.isUrgent, this.index});
 
   @override
   _VisitorAppointmentRequestState createState() =>
@@ -46,10 +58,9 @@ class _VisitorAppointmentRequestState extends State<VisitorAppointmentRequest> {
             child: const Text('No'),
           ),
           TextButton(
-            onPressed: () async {
+            onPressed: () {
               // print('apId=${widget.appointmentRequestData.id}');
-              await Provider.of<EmployeePendingAppointmentsRequestsProvider>(
-                      context,
+              Provider.of<EmployeePendingAppointmentsRequestsProvider>(context,
                       listen: false)
                   .rejectAppointment(widget.visitorAppointmentRequestData.id)
                   .then((value) {
@@ -64,8 +75,22 @@ class _VisitorAppointmentRequestState extends State<VisitorAppointmentRequest> {
     );
   }
 
-  Future<void> fetchData() async {
+  Future<void> fetchUrgentAppointments() async {
     try {
+      name = widget.visitorAppointmentRequestData.visitorName;
+      setState(() {
+        _isLoading = false;
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  Future<void> fetchSimpleAppointments() async {
+    try {
+      print('simpleAppType=${widget.visitorAppointmentRequestData}');
+      print('urgent=${widget.isUrgent}');
+      print('index=${widget.index}');
       // final id = Provider.of<EmployeesProvider>(context).getEmployee.id;
       final visitorId = widget.visitorAppointmentRequestData.visitorId;
       //final visitorId = '';
@@ -80,6 +105,8 @@ class _VisitorAppointmentRequestState extends State<VisitorAppointmentRequest> {
         name = '${data['firstName']} ${data['lastName']}';
       });
     } catch (error) {
+      print('isUrgent=${widget.isUrgent}');
+      print('errorIndex=${widget.index}');
       throw error;
     }
   }
@@ -88,104 +115,151 @@ class _VisitorAppointmentRequestState extends State<VisitorAppointmentRequest> {
   void initState() {
     super.initState();
     Future.delayed(Duration.zero).then((_) {
-      fetchData();
+      if (widget.isUrgent) {
+        fetchUrgentAppointments();
+      } else {
+        fetchSimpleAppointments();
+      }
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return _isLoading
-        ? Center(child: CircularProgressIndicator())
-        : Dismissible(
-            key: ValueKey(widget.visitorAppointmentRequestData.id),
-            onDismissed: (direction) async {
-              print(direction.index);
-              if (DismissDirection.startToEnd == direction) {
-                acceptAppointment(context);
-              } else {
-                rejectAppointment(context);
-              }
-            },
-            background: Container(
-              color: Colors.green,
-              alignment: Alignment.centerLeft,
-              child: Icon(Icons.add, size: 40, color: Colors.white),
-            ),
-            secondaryBackground: Container(
-              color: Theme.of(context).errorColor,
-              alignment: Alignment.centerRight,
-              child: Icon(Icons.delete, size: 40, color: Colors.white),
-            ),
-            child: Container(
-              // margin: EdgeInsets.symmetric(horizontal: 10, vertical: 20),
-              height: 150,
-              child: Card(
-                elevation: 5,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      height: 10,
+    return Dismissible(
+      key: ValueKey(widget.visitorAppointmentRequestData.id),
+      onDismissed: (direction) async {
+        print(direction.index);
+        if (DismissDirection.startToEnd == direction) {
+          _acceptAppointment(context);
+        } else {
+          _rejectAppointment(context);
+        }
+      },
+      background: Container(
+        color: Colors.green,
+        alignment: Alignment.centerLeft,
+        child: Icon(Icons.check, size: 40, color: Colors.white),
+      ),
+      secondaryBackground: Container(
+        color: Theme.of(context).errorColor,
+        alignment: Alignment.centerRight,
+        child: Icon(Icons.clear, size: 40, color: Colors.white),
+      ),
+      child: Container(
+        margin: EdgeInsets.symmetric(
+          horizontal: 10,
+        ),
+        height: 190,
+        child: Card(
+          elevation: 5,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Visibility(
+                visible: widget.isUrgent,
+                child: Align(
+                  alignment: Alignment.topRight,
+                  child: Container(
+                    width: 70,
+                    height: 35,
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      borderRadius: BorderRadius.only(
+                        bottomLeft: Radius.circular(10),
+                      ),
                     ),
-                    Row(children: [
-                      SizedBox(
-                        width: 5,
-                      ),
-                      CircleAvatar(
-                        backgroundImage: NetworkImage(data['avatar']),
-                      ),
-                      SizedBox(
-                        width: 5,
-                      ),
-                      Text(
-                        name,
+                    child: Center(
+                      child: Text(
+                        'Urgent',
                         style: TextStyle(
-                            color: Colors.black, fontWeight: FontWeight.bold),
-                      )
-                    ]),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        CustomIconTextWidget(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              Row(
+                children: [
+                  SizedBox(
+                    width: 5,
+                  ),
+                  _isLoading
+                      ? spinKitThreeBounce
+                      : CircleAvatar(
+                          backgroundImage: NetworkImage(widget.isUrgent
+                              ? widget.visitorAppointmentRequestData.imageUrl
+                              : data['avatar']),
+                        ),
+                  SizedBox(
+                    width: 5,
+                  ),
+                  _isLoading
+                      ? spinKitThreeBounce
+                      : Text(
+                          name,
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        )
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  _isLoading
+                      ? spinKitThreeBounce
+                      : CustomIconTextWidget(
                           iconData: Icons.calendar_today,
                           text: DateFormat.yMMMMd('en_US')
                               .format(widget.visitorAppointmentRequestData.date)
                               .toString(),
                         ),
-                        CustomIconTextWidget(
-                          iconData: Icons.timer,
-                          text: widget.visitorAppointmentRequestData.timeSlot,
-                        ),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [acceptButton(), rejectButton()],
-                    ),
-                    SizedBox(
-                      height: 20,
-                    )
-                  ],
-                ),
+                  CustomIconTextWidget(
+                    iconData: Icons.timer,
+                    text: widget.visitorAppointmentRequestData.timeSlot,
+                  ),
+                ],
               ),
-            ),
-          );
+              SizedBox(
+                height: 10,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [acceptButton(), rejectButton()],
+              ),
+              SizedBox(
+                height: 20,
+              )
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
-  void rejectAppointment(BuildContext context) {
+  void _rejectAppointment(BuildContext context) {
     try {
       Provider.of<EmployeePendingAppointmentsRequestsProvider>(context,
               listen: false)
-          .rejectAppointment(widget.visitorAppointmentRequestData.id);
+          .rejectAppointment(widget.visitorAppointmentRequestData.id)
+          .then((value) {
+        if (value == 200) {
+          showSnackMessage(context, 'Appointment Request Rejected');
+        }
+      });
     } catch (error) {
+      print('index=${widget.index}');
       throw error;
     }
   }
 
-  void acceptAppointment(BuildContext context) async {
+  void _acceptAppointment(BuildContext context) async {
     try {
       await Provider.of<EmployeePendingAppointmentsRequestsProvider>(context,
               listen: false)
@@ -210,7 +284,7 @@ class _VisitorAppointmentRequestState extends State<VisitorAppointmentRequest> {
   Widget acceptButton() {
     return GestureDetector(
       onTap: () {
-        acceptAppointment(context);
+        _acceptAppointment(context);
       },
       child: Container(
         height: 35,

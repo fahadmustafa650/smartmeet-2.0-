@@ -3,27 +3,20 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:smart_meet/Employee/employee_screens/employee_home_screen.dart';
-import 'package:smart_meet/models/message_model.dart';
 import 'package:smart_meet/providers/visitor_provider.dart';
 import 'Employee/EmployeeForgetPassword/employee_enter_email_screen.dart';
-import 'Employee/EmployeeForgetPassword/employee_new_password_screen.dart';
 import 'Employee/employee_screens/appointment_requests_screen.dart';
-import 'Employee/employee_screens/emp_sign_in_screen.dart';
 import 'Employee/employee_screens/emp_sign_up_screen.dart';
-import 'Employee/employee_screens/employee_booked_appointment.dart';
+import 'Employee/employee_screens/employee_booked_appointment_screen.dart';
 import 'Employee/employee_screens/employee_edit_profile_screen.dart';
-import 'Employee/employee_screens/employee_map_location_marker.dart';
 import 'Visitor/Appointment/appointment_sent_screen.dart';
 import 'Visitor/Appointment/visitor_pending_appointments_screen.dart';
 import 'Visitor/Appointment/request_appoinment_screen.dart';
-import 'Visitor/Appointment/reserve_spot_employee_screen.dart';
 import 'Visitor/Appointment/search_employee_screen.dart';
 import 'Visitor/Appointment/visitor_booked_appointment_screen.dart';
-import 'Visitor/Appointment/search_result_screen.dart';
 import 'Visitor/Device steps/facial_recognition_step3.dart';
-import 'Visitor/Device steps/qr_code_step1.dart';
-import 'Visitor/Device steps/run_in_appointment_screen.dart';
 import 'Visitor/Device steps/temperature_detector_step2.dart';
+import 'Visitor/RunInAppointment/run_in_appointment_screen.dart';
 import 'Visitor/Visitor Authentication/visitor_edit_profile_screen.dart';
 import 'Visitor/Visitor Authentication/visitor_sign_in_screen.dart';
 import 'Visitor/Visitor Authentication/visitor_sign_up_screen.dart';
@@ -41,21 +34,29 @@ import 'screens/chat_screen.dart';
 import 'screens/chating_screen.dart';
 import 'screens/contact_us.dart';
 import 'screens/edit_profile_screen.dart';
-import 'screens/google_map_search_test.dart';
 import 'screens/login_as_screen.dart';
 import 'Employee/employee_screens/employee_pending_appointments_screen.dart';
-import 'screens/map_screen.dart';
 import 'screens/onboarding_screens.dart';
+import 'screens/splash_screen.dart';
+import 'screens/sign_up_as_screen.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'Visitor/Device steps/qr_code_step1.dart';
+import 'Employee/employee_screens/employee_map_location_marker.dart';
+import 'Visitor/RunInAppointment/search_employee_screen.dart';
+import 'Visitor/Appointment/reserve_spot_employee_screen.dart';
+import 'screens/google_map_search_test.dart';
+import 'screens/map_screen.dart';
 import 'screens/otp_screen.dart';
 import 'screens/password_changed_successfully.dart';
 import 'screens/qr_code_screen.dart';
-import 'screens/splash_screen.dart';
-import 'screens/sign_up_as_screen.dart';
 import 'screens/test_api.dart';
 import 'screens/test_image_picker.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-
+import 'package:smart_meet/models/message_model.dart';
+import 'screens/test_list_screen.dart';
 import 'screens/test_ocr.dart';
+import 'Employee/employee_screens/emp_sign_in_screen.dart';
+import 'Employee/EmployeeForgetPassword/employee_new_password_screen.dart';
+import 'Visitor/Appointment/search_result_screen.dart';
 
 const AndroidNotificationChannel channel = AndroidNotificationChannel(
   'high_importance_channel',
@@ -111,7 +112,7 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
         debugShowMaterialGrid: false,
-        home: RunInAppointmentScreen(),
+        home: EmployeeBookedAppointmentsScreen(),
         // initialRoute: RequestAppointmentScreen.id,
         debugShowCheckedModeBanner: false,
         routes: {
@@ -141,8 +142,7 @@ class MyApp extends StatelessWidget {
           MaskDetectionStep4.id: (context) => MaskDetectionStep4(),
           OnBoardingScreens.id: (context) => OnBoardingScreens(),
           RequestAppointmentScreen.id: (context) => RequestAppointmentScreen(),
-          ReserveEmployeeSpotScreen.id: (context) =>
-              ReserveEmployeeSpotScreen(),
+          RunInAppointmentScreen.id: (context) => RunInAppointmentScreen(),
           // ScanQRCodeStep1.id: (context) => ScanQRCodeStep1(),
           SignUpAsScreen.id: (context) => SignUpAsScreen(),
           //PasswordChangedSuccess.id: (context) => PasswordChangedSuccess(),
@@ -151,7 +151,7 @@ class MyApp extends StatelessWidget {
           VisitorHomeScreen.id: (context) => VisitorHomeScreen(),
           VisitorEditProfileScreen.id: (context) => VisitorEditProfileScreen(),
           VisitorEnterEmailScreen.id: (context) => VisitorEnterEmailScreen(),
-          //VisitorSignInScreen.id: (context) => VisitorSignInScreen(),
+          VisitorSignInScreen.id: (context) => VisitorSignInScreen(),
           VisitorSignUpScreen.id: (context) => VisitorSignUpScreen(),
           VisitorPendingAppointmentsScreen.id: (context) =>
               VisitorPendingAppointmentsScreen(),

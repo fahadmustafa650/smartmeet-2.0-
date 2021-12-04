@@ -10,7 +10,7 @@ import 'package:smart_meet/providers/employee_provider.dart';
 import 'package:smart_meet/screens/chat_screen.dart';
 import 'package:smart_meet/screens/login_as_screen.dart';
 import 'package:smart_meet/widgets/info_panel.dart';
-import 'package:smart_meet/Employee/employee_screens/employee_booked_appointment.dart';
+import 'package:smart_meet/Employee/employee_screens/employee_booked_appointment_screen.dart';
 
 import 'employee_edit_profile_screen.dart';
 

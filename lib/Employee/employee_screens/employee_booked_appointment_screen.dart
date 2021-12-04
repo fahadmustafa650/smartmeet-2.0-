@@ -29,11 +29,11 @@ class _EmployeeBookedAppointmentsScreenState
     extends State<EmployeeBookedAppointmentsScreen> {
   bool _isInit = false;
   bool _isLoading = true;
-  List<Appointment> _appointmentBookedAppointments;
+  List<dynamic> _bookedAppointmentsList = [];
   void fetchAndGetData() async {
-    final employeeId =
-        Provider.of<EmployeesProvider>(context, listen: false).getEmployee.id;
-    //final employeeId = '6160912d9ddfb800041e6fd5';
+    // final employeeId =
+    //     Provider.of<EmployeesProvider>(context, listen: false).getEmployee.id;
+    final employeeId = '6160912d9ddfb800041e6fd5';
 
     // String name =
     //     '${Provider.of<EmployeesProvider>(context, listen: false).getEmployee.firstName} ${Provider.of<EmployeesProvider>(context, listen: false).getEmployee.lastName} ';
@@ -43,12 +43,12 @@ class _EmployeeBookedAppointmentsScreenState
       return;
     }
     try {
-      print('abc');
+      //print('abc');
       await Provider.of<EmployeeBookedAppointmentsProvider>(context,
               listen: false)
           .bookedAppointmentsList(employeeId)
           .then((_) {
-        _appointmentBookedAppointments =
+        _bookedAppointmentsList =
             Provider.of<EmployeeBookedAppointmentsProvider>(context,
                     listen: false)
                 .getBookedAppointmentRequests;
@@ -89,23 +89,19 @@ class _EmployeeBookedAppointmentsScreenState
           },
           icon: Icon(Icons.arrow_back, color: Colors.white),
         ),
-        title: Text('Accepted Appointments'),
+        title: Text('Booked Appointments'),
         centerTitle: true,
       ),
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
-          : _appointmentBookedAppointments.length == 0
+          : _bookedAppointmentsList.length == 0
               ? Center(child: Text('No Booked Appointments'))
               : ListView.builder(
-                  itemCount: _appointmentBookedAppointments.length,
+                  itemCount: _bookedAppointmentsList.length,
                   itemBuilder: (ctx, index) {
                     return EmployeeBookedInfo(
-                      visitorId:
-                          _appointmentBookedAppointments[index].visitorId,
-                      date: DateTime.parse(_appointmentBookedAppointments[index]
-                          .date
-                          .toString()),
-                      timeSlot: _appointmentBookedAppointments[index].timeSlot,
+                      visitorData: _bookedAppointmentsList[index],
+                      isUrgent: _bookedAppointmentsList[index].isUrgent,
                     );
                   },
                 ),
@@ -114,14 +110,12 @@ class _EmployeeBookedAppointmentsScreenState
 }
 
 class EmployeeBookedInfo extends StatefulWidget {
-  final String visitorId;
-  final DateTime date;
-  final String timeSlot;
+  final visitorData;
+  final bool isUrgent;
 
   const EmployeeBookedInfo({
-    @required this.visitorId,
-    @required this.date,
-    @required this.timeSlot,
+    @required this.visitorData,
+    @required this.isUrgent,
   });
 
   @override
@@ -129,17 +123,21 @@ class EmployeeBookedInfo extends StatefulWidget {
 }
 
 class _EmployeeBookedInfoState extends State<EmployeeBookedInfo> {
-  var responseData;
+  //var responseData;
   var _isLoading = true;
-  void _fetchData() async {
-    print('visiId=${widget.visitorId}');
+  String name;
+  String imageUrl;
+  void _fetchSimpleBookedData() async {
+    //print('visiId=${widget.visitorId}');
     final url = Uri.parse(
-        'https://pure-woodland-42301.herokuapp.com/api/visitor/usersProfile/${widget.visitorId}');
+        'https://pure-woodland-42301.herokuapp.com/api/visitor/usersProfile/${widget.visitorData.visitorId}');
     try {
       final response = await http.get(url);
       print('visitorBody=${response.body}');
       if (response.statusCode == 200) {
-        responseData = jsonDecode(response.body)['user'];
+        final responseData = jsonDecode(response.body)['user'];
+        name = "${responseData['firstName']} ${responseData['lastName']}";
+        imageUrl = responseData['avatar'];
         // print('fName=${responseData['firstName']}');
         // print('lName=${responseData['lastName']}');
         setState(() {
@@ -152,18 +150,29 @@ class _EmployeeBookedInfoState extends State<EmployeeBookedInfo> {
     }
   }
 
+  void _fetchUrgentBookedData() {
+    name = '${widget.visitorData.visitorName}';
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
-    Future.delayed(Duration.zero).then((_) {
-      _fetchData();
-    });
+    if (widget.isUrgent) {
+      _fetchUrgentBookedData();
+    } else {
+      Future.delayed(Duration.zero).then((_) {
+        _fetchSimpleBookedData();
+      });
+    }
     // print('empId=${widget.employeeId}');
   }
 
   @override
   Widget build(BuildContext context) {
-    print(widget.timeSlot);
+    //print(widget.timeSlot);
 
     final screenWidth = MediaQuery.of(context).size.width;
     // final screenHeight = MediaQuery.of(context).size.height;
@@ -179,7 +188,10 @@ class _EmployeeBookedInfoState extends State<EmployeeBookedInfo> {
               child: Row(
                 children: [
                   Image(
-                    image: NetworkImage(responseData['avatar']),
+                    width: 180,
+                    image: NetworkImage(imageUrl == null
+                        ? 'https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__480.jpg'
+                        : imageUrl),
                   ),
                   SizedBox(
                     width: 6,
@@ -189,7 +201,7 @@ class _EmployeeBookedInfoState extends State<EmployeeBookedInfo> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        '${responseData['firstName'].toString()} ${responseData['lastName'].toString()}',
+                        name,
                         style: TextStyle(
                           color: Colors.black,
                           fontSize: 18,
@@ -210,7 +222,8 @@ class _EmployeeBookedInfoState extends State<EmployeeBookedInfo> {
                             width: 5,
                           ),
                           Text(
-                            DateFormat.yMMMMd('en_US').format(widget.date),
+                            DateFormat.yMMMMd('en_US')
+                                .format(widget.visitorData.date),
                             style: TextStyle(
                                 color: Colors.black,
                                 fontSize: 14,
@@ -235,7 +248,7 @@ class _EmployeeBookedInfoState extends State<EmployeeBookedInfo> {
                             width: 5,
                           ),
                           Text(
-                            widget.timeSlot,
+                            widget.visitorData.timeSlot,
                             style: TextStyle(
                                 color: Colors.black,
                                 fontSize: 14,

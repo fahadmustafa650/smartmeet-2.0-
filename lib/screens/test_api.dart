@@ -6,14 +6,14 @@ import 'package:provider/provider.dart';
 import 'package:smart_meet/models/appointment.dart';
 import 'package:smart_meet/providers/employee_pending_appointments_provider.dart';
 
-class GetImage extends StatefulWidget {
-  const GetImage({Key key}) : super(key: key);
+class TestApi extends StatefulWidget {
+  const TestApi({Key key}) : super(key: key);
 
   @override
-  _GetImageState createState() => _GetImageState();
+  _TestApiState createState() => _TestApiState();
 }
 
-class _GetImageState extends State<GetImage> {
+class _TestApiState extends State<TestApi> {
   String imageUrl;
   var isLoading = true;
   void getData() async {
@@ -31,6 +31,16 @@ class _GetImageState extends State<GetImage> {
     // print(extractedData);
   }
 
+  getAppointment() async {
+    final url = Uri.parse(
+        'https://pure-woodland-42301.herokuapp.com/api/employee/6160912d9ddfb800041e6fd5/pendingappointmentrequests');
+    final response = await http.get(url);
+    final extractedData = await json.decode(response.body) as List<dynamic>;
+    print('extractedData===>$extractedData');
+    final pendingAppointmentData = extractedData[0] as List<dynamic>;
+    print('pendingAppointments$pendingAppointmentData');
+  }
+
   void initState() {
     super.initState();
     getData();
@@ -44,7 +54,7 @@ class _GetImageState extends State<GetImage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           TextButton(
-            onPressed: getData,
+            onPressed: getAppointment,
             child: Text('Get Data'),
           ),
           isLoading

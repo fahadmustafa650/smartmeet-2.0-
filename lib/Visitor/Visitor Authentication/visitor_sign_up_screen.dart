@@ -37,6 +37,8 @@ class _VisitorSignUpScreenState extends State<VisitorSignUpScreen> {
   UploadTask task;
   DateTime _dateOfBirth;
   var isChecked = false;
+  var isPasswordVisible = false;
+  var isConfirmPasswordVisible = false;
   // formKey
   final _formKey = GlobalKey<FormState>();
   // File imgFile;
@@ -547,9 +549,9 @@ class _VisitorSignUpScreenState extends State<VisitorSignUpScreen> {
                             ),
                             SizedBox(height: 8.0),
                             ClipRRect(
-                              borderRadius: BorderRadius.circular(50),
+                              borderRadius: BorderRadius.circular(30),
                               child: TextFormField(
-                                obscureText: true,
+                                obscureText: isPasswordVisible,
                                 style: loginTextFieldsStyles,
                                 textInputAction: TextInputAction.next,
                                 keyboardType: TextInputType.visiblePassword,
@@ -578,7 +580,19 @@ class _VisitorSignUpScreenState extends State<VisitorSignUpScreen> {
                                       Icons.lock_outline,
                                       color: Colors.grey,
                                     ),
-                                    suffixIcon: Icon(Icons.remove_red_eye)),
+                                    suffix: IconButton(
+                                      icon: Icon(
+                                        isPasswordVisible
+                                            ? Icons.visibility
+                                            : Icons.visibility_off,
+                                      ),
+                                      onPressed: () {
+                                        setState(() {
+                                          isPasswordVisible =
+                                              !isPasswordVisible;
+                                        });
+                                      },
+                                    )),
                               ),
                             ),
                             SizedBox(height: 5.0),
@@ -633,8 +647,18 @@ class _VisitorSignUpScreenState extends State<VisitorSignUpScreen> {
                                   Icons.lock_outline,
                                   color: Colors.grey,
                                 ),
-                                suffixIcon: Icon(
-                                  Icons.remove_red_eye,
+                                suffix: IconButton(
+                                  icon: Icon(
+                                    isConfirmPasswordVisible
+                                        ? Icons.visibility
+                                        : Icons.visibility_off,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      isConfirmPasswordVisible =
+                                          !isConfirmPasswordVisible;
+                                    });
+                                  },
                                 ),
                               ),
                             ),
@@ -681,24 +705,24 @@ class _VisitorSignUpScreenState extends State<VisitorSignUpScreen> {
                             SizedBox(
                               height: 13.0,
                             ),
-                            Text(
-                              'OR Continue with',
-                              style: TextStyle(
-                                  color: Colors.black87, fontSize: 18),
-                            ),
-                            SizedBox(
-                              height: 13.0,
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                LoginWithFbBtn(),
-                                LoginWithGoogleBtn(),
-                              ],
-                            ),
-                            SizedBox(
-                              height: 13.0,
-                            ),
+                            // Text(
+                            //   'OR Continue with',
+                            //   style: TextStyle(
+                            //       color: Colors.black87, fontSize: 18),
+                            // ),
+                            // SizedBox(
+                            //   height: 13.0,
+                            // ),
+                            // Row(
+                            //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            //   children: [
+                            //     LoginWithFbBtn(),
+                            //     LoginWithGoogleBtn(),
+                            //   ],
+                            // ),
+                            // SizedBox(
+                            //   height: 13.0,
+                            // ),
                             Text(
                               'OR Sign Up with',
                               style: TextStyle(

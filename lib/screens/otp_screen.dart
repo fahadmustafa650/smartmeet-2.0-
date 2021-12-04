@@ -65,6 +65,12 @@ class _OtpScreenState extends State<OtpScreen> {
     });
   }
 
+  // void sendOtpCode() async {
+  //   EmailAuth emailAuth = new EmailAuth(sessionName: "Sample session");
+  //   bool result =
+  //       await emailAuth.sendOtp(recipientMail: widget.email, otpLength: 5);
+  // }
+
   @override
   void initState() {
     super.initState();
@@ -147,10 +153,12 @@ class _OtpScreenState extends State<OtpScreen> {
   }
 
   void _sendOtpRequest() {
+    print('otp send ...');
+    String dummyemail = 'fahadmustafa650@gmail.com';
     try {
       EmailAuth.sessionName = 'Visitor Session';
 
-      EmailAuth.sendOtp(receiverMail: widget.email);
+      EmailAuth.sendOtp(receiverMail: dummyemail);
     } catch (error) {
       print(error);
       print('otp sent error');
@@ -210,6 +218,7 @@ class _OtpScreenState extends State<OtpScreen> {
 
   void addData() async {
     widget.addAllData(context);
+
     setState(() {
       _isLoading = false;
     });

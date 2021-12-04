@@ -7,6 +7,7 @@ import 'package:date_time_picker/date_time_picker.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:smart_meet/Constants/constants.dart';
 import 'package:smart_meet/Visitor/Appointment/appointment_sent_screen.dart';
 import 'package:smart_meet/api/firebase_api.dart';
 import 'package:smart_meet/providers/visitor_provider.dart';
@@ -49,19 +50,19 @@ class _RunInAppointmentScreenState extends State<RunInAppointmentScreen> {
 
     final routeArgs =
         ModalRoute.of(context).settings.arguments as Map<String, String>;
-    //String _employeeId = routeArgs['employeeId'];
+    String _employeeId = routeArgs['employeeId'];
     // 6160912d9ddfb800041e6fd5
-    String _employeeId = '6160912d9ddfb800041e6fd5';
-    print('empId=${_employeeId}');
-    print('visitorId=${_emailController.text.toString()}');
-    print('startTime=${_selectedStartTime}');
-    print('endTime=${_selectedEndTime}');
-    print('reason=${_visitorReasonField.text.toString()}');
-    print('image=$_imageUrl');
-    print('firstName=${_firstNameController.text.toString()}');
-    print('lastName=${_lastNameController.text.toString()}');
-    print('company=${_companyController.text.toString()}');
-    print('message=${_visitorReasonField.text.toString()}');
+    //// String _employeeId = '6160912d9ddfb800041e6fd5';
+    // print('empId=${_employeeId}');
+    // print('visitorId=${_emailController.text.toString()}');
+    // print('startTime=${_selectedStartTime}');
+    // print('endTime=${_selectedEndTime}');
+    // print('reason=${_visitorReasonField.text.toString()}');
+    // print('image=$_imageUrl');
+    // print('firstName=${_firstNameController.text.toString()}');
+    // print('lastName=${_lastNameController.text.toString()}');
+    // print('company=${_companyController.text.toString()}');
+    // print('message=${_visitorReasonField.text.toString()}');
 
     setState(() {});
     await _uploadFile().then((value) async {
@@ -292,74 +293,7 @@ class _RunInAppointmentScreenState extends State<RunInAppointmentScreen> {
                 ),
               ),
               Row(
-                children: [
-                  Expanded(
-                    child: Container(
-                      margin:
-                          EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        color: Colors.white,
-                      ),
-                      child: TextFormField(
-                        controller: _firstNameController,
-                        decoration: InputDecoration(
-                            labelText: 'First Name',
-                            contentPadding: EdgeInsets.only(left: 10),
-                            border: InputBorder.none,
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(20),
-                              borderSide: BorderSide(
-                                color: Colors.lightBlue,
-                                width: 2,
-                              ),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(25.0),
-                              borderSide: BorderSide(
-                                color: Colors.grey,
-                                width: 1.0,
-                              ),
-                            ),
-                            labelStyle:
-                                TextStyle(color: Colors.grey, fontSize: 18)),
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: Container(
-                      margin:
-                          EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        color: Colors.white,
-                      ),
-                      child: TextFormField(
-                        controller: _lastNameController,
-                        decoration: InputDecoration(
-                            labelText: 'Last Name',
-                            contentPadding: EdgeInsets.only(left: 10),
-                            border: InputBorder.none,
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(20),
-                              borderSide: BorderSide(
-                                color: Colors.lightBlue,
-                                width: 2,
-                              ),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(25.0),
-                              borderSide: BorderSide(
-                                color: Colors.grey,
-                                width: 1.0,
-                              ),
-                            ),
-                            labelStyle:
-                                TextStyle(color: Colors.grey, fontSize: 18)),
-                      ),
-                    ),
-                  )
-                ],
+                children: [_firstNameField(), _lastNameField()],
               ),
               SizedBox(
                 height: 5,
@@ -386,6 +320,74 @@ class _RunInAppointmentScreenState extends State<RunInAppointmentScreen> {
               _requestAppointmentBtn(context)
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Expanded _lastNameField() {
+    return Expanded(
+      child: Container(
+        margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          color: Colors.white,
+        ),
+        child: TextFormField(
+          controller: _lastNameController,
+          decoration: InputDecoration(
+              labelText: 'Last Name',
+              contentPadding: EdgeInsets.only(left: 10),
+              border: InputBorder.none,
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(20),
+                borderSide: BorderSide(
+                  color: Colors.lightBlue,
+                  width: 2,
+                ),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(25.0),
+                borderSide: BorderSide(
+                  color: Colors.grey,
+                  width: 1.0,
+                ),
+              ),
+              labelStyle: TextStyle(color: Colors.grey, fontSize: 18)),
+        ),
+      ),
+    );
+  }
+
+  Expanded _firstNameField() {
+    return Expanded(
+      child: Container(
+        margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          color: Colors.white,
+        ),
+        child: TextFormField(
+          controller: _firstNameController,
+          decoration: InputDecoration(
+              labelText: 'First Name',
+              contentPadding: EdgeInsets.only(left: 10),
+              border: InputBorder.none,
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(20),
+                borderSide: BorderSide(
+                  color: Colors.lightBlue,
+                  width: 2,
+                ),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(25.0),
+                borderSide: BorderSide(
+                  color: Colors.grey,
+                  width: 1.0,
+                ),
+              ),
+              labelStyle: TextStyle(color: Colors.grey, fontSize: 18)),
         ),
       ),
     );
@@ -465,7 +467,7 @@ class _RunInAppointmentScreenState extends State<RunInAppointmentScreen> {
               color: Colors.lightBlue, borderRadius: BorderRadius.circular(30)),
           child: Center(
             child: _isLoading
-                ? CircularProgressIndicator()
+                ? threeBounceSpinkit
                 : Text(
                     'Request Appointment',
                     style: TextStyle(

@@ -1,22 +1,30 @@
 import 'package:flutter/foundation.dart';
 
-class Appointment {
+class RunInAppointment {
   final String id;
-  final String visitorId;
+
   final String employeeId;
+  final String visitorName;
+  final String visitorEmail;
+  final String visitorPhone;
   final String companyName;
   final DateTime date;
+  final String imageUrl;
   final String timeSlot;
   final String message;
   final bool isUrgent;
-  Appointment({
+
+  const RunInAppointment({
     @required this.id,
-    @required this.visitorId,
+    @required this.visitorName,
     @required this.employeeId,
+    @required this.visitorEmail,
+    @required this.visitorPhone,
+    @required this.companyName,
     @required this.date,
+    @required this.imageUrl,
     @required this.timeSlot,
-    this.message,
-    this.companyName,
+    @required this.message,
     @required this.isUrgent,
   });
 }
