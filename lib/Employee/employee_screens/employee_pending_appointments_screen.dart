@@ -10,7 +10,7 @@ import 'package:smart_meet/providers/employee_provider.dart';
 import 'package:smart_meet/widgets/appointment_request.dart';
 
 class EmployeePendingAppointmentsScreen extends StatefulWidget {
-  static final id = '/employee_pending_screen';
+  static final id = '/employee_pending_Appointment_screen';
   final String employeeId;
 
   const EmployeePendingAppointmentsScreen({
@@ -56,28 +56,6 @@ class _EmployeePendingAppointmentsScreenState
     }
   }
 
-  // Future<void> _fetchRunInAppointmentsData() async {
-  //   print('fetching Run In Appointmnet data');
-  //   try {
-  //     // final employeeId = Provider.of<EmployeesProvider>(context).getEmployee.id;
-  //     print('e1');
-  //     final employeeId = '6160912d9ddfb800041e6fd5';
-  //     print('e2');
-  //     if (employeeId == null) return;
-  //     print('e3');
-  //     await Provider.of<EmployeePendingAppointmentsRequestsProvider>(
-  //       context,
-  //       listen: false,
-  //     ).pendingRunInAppointmentRequestsList(employeeId).then((_) {
-  //       allAppointmentsData();
-  //     });
-  //     print('e4');
-  //   } catch (error) {
-  //     print(error);
-  //     throw error;
-  //   }
-  // }
-
   Future<void> _allAppointmentsData() async {
     print('fetching All data');
     print('isLoading: $_isLoading');
@@ -85,7 +63,7 @@ class _EmployeePendingAppointmentsScreenState
     // ignore: unnecessary_statements
     Provider.of<EmployeePendingAppointmentsRequestsProvider>(context,
             listen: false)
-        .allPendingAppointmentsList();
+        .pendingAppointmentRequestsList;
 
     print('All Appointments = $_allAppointmentsList');
     _allAppointmentsList.forEach((element) {
@@ -118,7 +96,7 @@ class _EmployeePendingAppointmentsScreenState
     _allAppointmentsList =
         Provider.of<EmployeePendingAppointmentsRequestsProvider>(context,
                 listen: true)
-            .getAllAppointments;
+            .getPendingAppointmentRequests;
     // final int runInAppointmentLength =
     //     Provider.of<EmployeePendingAppointmentsRequestsProvider>(context,
     //             listen: false)
@@ -126,46 +104,210 @@ class _EmployeePendingAppointmentsScreenState
     //         .length;
     return RefreshIndicator(
       onRefresh: _fetchAppointmentPendingData,
-      child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          centerTitle: true,
-          leading: IconButton(
-              icon: Icon(
-                Icons.arrow_back,
-                color: Colors.black,
-              ),
-              onPressed: () {
-                Navigator.pop(context);
-              }),
-          title: Text(
-            'Pending Appointments',
-            style: TextStyle(color: Colors.black, fontSize: 20),
+      child: DefaultTabController(
+        length: 2,
+        child: Scaffold(
+          appBar: AppBar(
+            backgroundColor: Colors.white,
+            centerTitle: true,
+            leading: IconButton(
+                icon: Icon(
+                  Icons.arrow_back,
+                  color: Colors.black,
+                ),
+                onPressed: () {
+                  Navigator.pop(context);
+                }),
+            title: Text(
+              'Pending Appointments',
+              style: TextStyle(color: Colors.black, fontSize: 20),
+            ),
+            bottom: TabBar(
+              labelColor: Colors.black,
+              tabs: [
+                Tab(
+                  text: 'Appointments',
+                ),
+                Tab(
+                  text: 'Urgent',
+                ),
+              ],
+            ),
+          ),
+          body: TabBarView(
+            children: [
+              SimpleAppointmentsTab(),
+              UrgentAppointmentsTab(),
+            ],
           ),
         ),
-        body: _isLoading
-            ? Center(child: CircularProgressIndicator())
-            : _allAppointmentsList.length == 0
-                ? Center(
-                    child: Text('No Pending Requests'),
-                  )
-                : Consumer<EmployeePendingAppointmentsRequestsProvider>(
-                    // stream: null,
-                    builder: (ctx, pendingAppointments, child) {
-                    return ListView.builder(
-                      itemCount: _allAppointmentsList.length,
-                      itemBuilder: (ctx, index) {
-                        return VisitorAppointmentRequest(
-                          visitorAppointmentRequestData:
-                              pendingAppointments.getAllAppointments[index],
-                          isUrgent: pendingAppointments
-                              .getAllAppointments[index].isUrgent,
-                          index: index,
-                        );
-                      },
-                    );
-                  }),
       ),
     );
+  }
+}
+
+class SimpleAppointmentsTab extends StatefulWidget {
+  @override
+  _SimpleAppointmentsTabState createState() => _SimpleAppointmentsTabState();
+}
+
+class _SimpleAppointmentsTabState extends State<SimpleAppointmentsTab> {
+  bool _isLoading = true;
+  var _isInit = false;
+  //List<Appointment> _allSimpleAppointmentsList = [];
+
+  // Future<void> _allAppointmentsData() {
+  //   print('fetching All data');
+  //   print('isLoading: $_isLoading');
+  //   //print();
+  //   Provider.of<EmployeePendingAppointmentsRequestsProvider>(context,
+  //           listen: false)
+  //       .allPendingAppointmentsList();
+
+  //   // print('All Appointments = $_allSimpleAppointmentsList');
+  //   // _allSimpleAppointmentsList.forEach((element) {
+  //   //   print(element);
+  //   // });
+  //   //print('allA');
+  //   setState(() {
+  //     _isLoading = false;
+  //   });
+  // }
+
+  Future<void> _fetchAppointmentPendingData() async {
+    print('fetching Appoint data');
+    try {
+      // final employeeId = Provider.of<EmployeesProvider>(context).getEmployee.id;
+      final employeeId = '6160912d9ddfb800041e6fd5';
+      if (employeeId == null) return;
+      await Provider.of<EmployeePendingAppointmentsRequestsProvider>(
+        context,
+        listen: false,
+      ).pendingAppointmentRequestsList(employeeId).then(
+        (_) {
+          //_allAppointmentsData();
+          //_fetchRunInAppointmentsData();
+          setState(() {
+            _isLoading = false;
+          });
+        },
+      );
+    } catch (error) {
+      print(error);
+      throw error;
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _isInit = true;
+  }
+
+  @override
+  void didChangeDependencies() {
+    // TODO: implement didChangeDependencies
+    super.didChangeDependencies();
+    if (_isInit) {
+      _fetchAppointmentPendingData();
+      _isInit = false;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final _allSimpleAppointmentsList =
+        Provider.of<EmployeePendingAppointmentsRequestsProvider>(context,
+                listen: true)
+            .getPendingAppointmentRequests;
+    return _isLoading
+        ? Center(child: CircularProgressIndicator())
+        : _allSimpleAppointmentsList.length == 0
+            ? Center(child: Text('No Pending Appointments'))
+            : ListView.builder(
+                itemCount: _allSimpleAppointmentsList.length,
+                itemBuilder: (ctx, index) {
+                  return VisitorAppointmentRequest(
+                    visitorAppointmentRequestData:
+                        _allSimpleAppointmentsList[index],
+                    isUrgent: _allSimpleAppointmentsList[index].isUrgent,
+                    // index: index,
+                  );
+                },
+              );
+  }
+}
+
+class UrgentAppointmentsTab extends StatefulWidget {
+  @override
+  _UrgentAppointmentsTabState createState() => _UrgentAppointmentsTabState();
+}
+
+class _UrgentAppointmentsTabState extends State<UrgentAppointmentsTab> {
+  bool _isLoading = true;
+  var _isInit = false;
+
+  Future<void> _fetchAppointmentPendingData() async {
+    print('fetching Appoint data');
+    try {
+      // final employeeId = Provider.of<EmployeesProvider>(context).getEmployee.id;
+      final employeeId = '6160912d9ddfb800041e6fd5';
+      if (employeeId == null) return;
+      await Provider.of<EmployeePendingAppointmentsRequestsProvider>(
+        context,
+        listen: false,
+      ).pendingAppointmentRequestsList(employeeId).then(
+        (_) {
+          //_allAppointmentsData();
+          //_fetchRunInAppointmentsData();
+          setState(() {
+            _isLoading = false;
+          });
+        },
+      );
+    } catch (error) {
+      print(error);
+      throw error;
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _isInit = true;
+  }
+
+  @override
+  void didChangeDependencies() {
+    // TODO: implement didChangeDependencies
+    super.didChangeDependencies();
+    if (_isInit) {
+      _fetchAppointmentPendingData();
+      _isInit = false;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final _allUrgentAppointmentRequests =
+        Provider.of<EmployeePendingAppointmentsRequestsProvider>(context,
+                listen: true)
+            .getPendingRunInAppointmentRequests;
+    print('urgentAppointments=$_allUrgentAppointmentRequests');
+    return _isLoading
+        ? Center(child: CircularProgressIndicator())
+        : _allUrgentAppointmentRequests.length == 0
+            ? Center(child: Text('No Pending Appointments'))
+            : ListView.builder(
+                itemCount: _allUrgentAppointmentRequests.length,
+                itemBuilder: (ctx, index) {
+                  return VisitorAppointmentRequest(
+                    visitorAppointmentRequestData:
+                        _allUrgentAppointmentRequests[index],
+                    isUrgent: _allUrgentAppointmentRequests[index].isUrgent,
+                    //index: index,
+                  );
+                },
+              );
   }
 }

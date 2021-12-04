@@ -8,7 +8,8 @@ import 'package:smart_meet/models/runInAppointment_model.dart';
 class EmployeePendingAppointmentsRequestsProvider with ChangeNotifier {
   List<Appointment> _pendingAppointmentRequestsList = [];
   List<RunInAppointment> _runInAppointmentsRequestList = [];
-  List<dynamic> _allAppointmentsList = [];
+  //List<dynamic> _allAppointmentsList = [];
+
   List<Appointment> get getPendingAppointmentRequests {
     return _pendingAppointmentRequestsList == null
         ? []
@@ -21,74 +22,129 @@ class EmployeePendingAppointmentsRequestsProvider with ChangeNotifier {
         : [..._runInAppointmentsRequestList];
   }
 
-  List<dynamic> get getAllAppointments {
-    return _allAppointmentsList == null ? [] : [..._allAppointmentsList];
-  }
+  // List<dynamic> get getAllAppointments {
+  //   return _allAppointmentsList == null ? [] : [..._allAppointmentsList];
+  // }
 
-  void allPendingAppointmentsList() {
-    print('All Pending Appointments');
-    if (_pendingAppointmentRequestsList != null &&
-        _runInAppointmentsRequestList != null) {
-      _runInAppointmentsRequestList.forEach((element) {
-        _allAppointmentsList.add(element);
-      });
-      _pendingAppointmentRequestsList.forEach((element) {
-        _allAppointmentsList.add(element);
-      });
-      print('all App Length=${_allAppointmentsList.length}');
-    }
-  }
+  // void allPendingAppointmentsList() {
+  //   print('All Pending Appointments');
+  //   if (_pendingAppointmentRequestsList != null &&
+  //       _runInAppointmentsRequestList != null) {
+  //     _runInAppointmentsRequestList.forEach((element) {
+  //       _allAppointmentsList.add(element);
+  //     });
+  //     _pendingAppointmentRequestsList.forEach((element) {
+  //       _allAppointmentsList.add(element);
+  //     });
+  //     print('all App Length=${_allAppointmentsList.length}');
+  //   }
+  // }
 
-  Future<int> acceptAppointment(String id) async {
+  Future<int> acceptSimpleAppointment(String id) async {
     final url = Uri.parse(
         'https://pure-woodland-42301.herokuapp.com/api/employee/acceptappointment/$id');
-    int index = _allAppointmentsList.indexWhere((value) {
+    int index = _pendingAppointmentRequestsList.indexWhere((value) {
       return value.id == id;
     });
-    var pendingAppointment = _allAppointmentsList[index];
+    var pendingAppointment = _pendingAppointmentRequestsList[index];
     try {
       if (index != -1) {
-        _allAppointmentsList.removeAt(index);
+        _pendingAppointmentRequestsList.removeAt(index);
         notifyListeners();
       }
       final response = await http.post(url);
       print('response=${response.statusCode}');
       if (response.statusCode >= 400) {
-        _allAppointmentsList.insert(index, pendingAppointment);
+        _pendingAppointmentRequestsList.insert(index, pendingAppointment);
         notifyListeners();
         //print('index=$index');
-
       }
       return response.statusCode;
     } catch (error) {
-      _allAppointmentsList.insert(index, pendingAppointment);
+      _pendingAppointmentRequestsList.insert(index, pendingAppointment);
       throw error;
     }
   }
 
-  Future<int> rejectAppointment(String id) async {
+  Future<int> acceptUrgentAppointment(String id) async {
+    final url = Uri.parse(
+        'https://pure-woodland-42301.herokuapp.com/api/employee/acceptappointment/$id');
+    int index = _pendingAppointmentRequestsList.indexWhere((value) {
+      return value.id == id;
+    });
+    var pendingAppointment = _pendingAppointmentRequestsList[index];
+    try {
+      if (index != -1) {
+        _pendingAppointmentRequestsList.removeAt(index);
+        notifyListeners();
+      }
+      final response = await http.post(url);
+      print('response=${response.statusCode}');
+      if (response.statusCode >= 400) {
+        _pendingAppointmentRequestsList.insert(index, pendingAppointment);
+        notifyListeners();
+        //print('index=$index');
+      }
+      return response.statusCode;
+    } catch (error) {
+      _pendingAppointmentRequestsList.insert(index, pendingAppointment);
+      throw error;
+    }
+  }
+
+  Future<int> rejectUrgentAppointment(String id) async {
     final url = Uri.parse(
         'https://pure-woodland-42301.herokuapp.com/api/employee/rejectAppointment/$id');
     int index = _pendingAppointmentRequestsList.indexWhere((value) {
       return value.id == id;
     });
     print('index=$index');
-    var pendingAppointment = _allAppointmentsList[index];
+    var pendingAppointment = _pendingAppointmentRequestsList[index];
 
     if (index != -1) {
-      _allAppointmentsList.removeAt(index);
+      _pendingAppointmentRequestsList.removeAt(index);
       notifyListeners();
       try {
         final response = await http.post(url);
         print('rejectCode=${response.statusCode}');
         if (response.statusCode > 201) {
-          _allAppointmentsList.insert(index, pendingAppointment);
+          _pendingAppointmentRequestsList.insert(index, pendingAppointment);
           notifyListeners();
         }
         return response.statusCode;
       } catch (error) {
         print('providererrorindex=$index');
-        _allAppointmentsList.insert(index, pendingAppointment);
+        _pendingAppointmentRequestsList.insert(index, pendingAppointment);
+        notifyListeners();
+        throw error;
+      }
+    }
+    return 0;
+  }
+
+  Future<int> rejectSimpleAppointment(String id) async {
+    final url = Uri.parse(
+        'https://pure-woodland-42301.herokuapp.com/api/employee/rejectAppointment/$id');
+    int index = _pendingAppointmentRequestsList.indexWhere((value) {
+      return value.id == id;
+    });
+    print('index=$index');
+    var pendingAppointment = _pendingAppointmentRequestsList[index];
+
+    if (index != -1) {
+      _pendingAppointmentRequestsList.removeAt(index);
+      notifyListeners();
+      try {
+        final response = await http.post(url);
+        print('rejectCode=${response.statusCode}');
+        if (response.statusCode >= 400) {
+          _pendingAppointmentRequestsList.insert(index, pendingAppointment);
+          notifyListeners();
+        }
+        return response.statusCode;
+      } catch (error) {
+        print('providererrorindex=$index');
+        _pendingAppointmentRequestsList.insert(index, pendingAppointment);
         notifyListeners();
         throw error;
       }

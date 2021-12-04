@@ -112,7 +112,7 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
         debugShowMaterialGrid: false,
-        home: EmployeeBookedAppointmentsScreen(),
+        home: VisitorSignUpScreen(),
         // initialRoute: RequestAppointmentScreen.id,
         debugShowCheckedModeBanner: false,
         routes: {

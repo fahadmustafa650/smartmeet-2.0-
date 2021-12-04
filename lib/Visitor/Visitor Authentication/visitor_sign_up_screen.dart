@@ -38,7 +38,8 @@ class _VisitorSignUpScreenState extends State<VisitorSignUpScreen> {
   DateTime _dateOfBirth;
   var isChecked = false;
   var isPasswordVisible = false;
-  var isConfirmPasswordVisible = false;
+  bool isConfirmPasswordVisible = false;
+  bool hidePassword = true;
   // formKey
   final _formKey = GlobalKey<FormState>();
   // File imgFile;
@@ -548,120 +549,9 @@ class _VisitorSignUpScreenState extends State<VisitorSignUpScreen> {
                               ),
                             ),
                             SizedBox(height: 8.0),
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(30),
-                              child: TextFormField(
-                                obscureText: isPasswordVisible,
-                                style: loginTextFieldsStyles,
-                                textInputAction: TextInputAction.next,
-                                keyboardType: TextInputType.visiblePassword,
-                                controller: _passwordController,
-                                validator: (value) {
-                                  if (value.isEmpty) {
-                                    return "Please Enter Password";
-                                  }
-
-                                  return null;
-                                },
-                                decoration: InputDecoration(
-                                    fillColor: Colors.grey[100],
-                                    filled: true,
-                                    border: InputBorder.none,
-                                    contentPadding: EdgeInsets.fromLTRB(
-                                      20.0,
-                                      15.0,
-                                      20.0,
-                                      15.0,
-                                    ),
-                                    labelText: 'Password',
-                                    labelStyle: TextStyle(
-                                        color: Colors.grey, fontSize: 15),
-                                    prefixIcon: Icon(
-                                      Icons.lock_outline,
-                                      color: Colors.grey,
-                                    ),
-                                    suffix: IconButton(
-                                      icon: Icon(
-                                        isPasswordVisible
-                                            ? Icons.visibility
-                                            : Icons.visibility_off,
-                                      ),
-                                      onPressed: () {
-                                        setState(() {
-                                          isPasswordVisible =
-                                              !isPasswordVisible;
-                                        });
-                                      },
-                                    )),
-                              ),
-                            ),
+                            _passwordField(),
                             SizedBox(height: 5.0),
-                            TextFormField(
-                              obscureText: true,
-                              style: loginTextFieldsStyles,
-                              textInputAction: TextInputAction.next,
-                              keyboardType: TextInputType.visiblePassword,
-                              controller: _confirmPasswordController,
-                              onChanged: (value) {
-                                if (value !=
-                                    _passwordController.text.toString()) {
-                                  setState(() {
-                                    errorPassword = "Password Doesn't Match";
-                                  });
-                                }
-                                if (value ==
-                                    _passwordController.text.toString()) {
-                                  setState(() {
-                                    errorPassword = "";
-                                  });
-                                }
-                              },
-                              validator: (value) {
-                                if (value.isEmpty) {
-                                  return "Please Enter Password";
-                                } else if (value !=
-                                    _passwordController.text.toString()) {
-                                  return "Those passwords didn’t match. Try again!";
-                                }
-                                return null;
-                              },
-                              decoration: InputDecoration(
-                                fillColor: Colors.grey[100],
-                                filled: true,
-                                //errorText: errorPassword,
-                                errorStyle:
-                                    TextStyle(color: Colors.red, fontSize: 14),
-                                border: InputBorder.none,
-                                contentPadding: EdgeInsets.fromLTRB(
-                                  20.0,
-                                  15.0,
-                                  20.0,
-                                  15.0,
-                                ),
-                                labelText: 'Confirm Password',
-                                labelStyle: TextStyle(
-                                  color: Colors.grey,
-                                  fontSize: 15,
-                                ),
-                                prefixIcon: Icon(
-                                  Icons.lock_outline,
-                                  color: Colors.grey,
-                                ),
-                                suffix: IconButton(
-                                  icon: Icon(
-                                    isConfirmPasswordVisible
-                                        ? Icons.visibility
-                                        : Icons.visibility_off,
-                                  ),
-                                  onPressed: () {
-                                    setState(() {
-                                      isConfirmPasswordVisible =
-                                          !isConfirmPasswordVisible;
-                                    });
-                                  },
-                                ),
-                              ),
-                            ),
+                            _confirmPasswordField(),
                             SizedBox(height: 5.0),
                             ListTile(
                               leading: TermsCondition(),
@@ -758,6 +648,101 @@ class _VisitorSignUpScreenState extends State<VisitorSignUpScreen> {
         ),
       ),
     );
+  }
+
+  ClipRRect _confirmPasswordField() {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(30),
+      child: Container(
+        height: 70,
+        child: TextFormField(
+          obscureText: isConfirmPasswordVisible,
+          controller: _confirmPasswordController,
+          style: loginTextFieldsStyles,
+          validator: (value) {
+            if (value.isEmpty) {
+              return 'Please Enter Password';
+            }
+            return null;
+          },
+          decoration: InputDecoration(
+            fillColor: Colors.grey[100],
+            filled: true,
+            border: InputBorder.none,
+            // contentPadding: EdgeInsets.fromLTRB(
+            //   20.0,
+            //   15.0,
+            //   20.0,
+            //   15.0,
+            // ),
+            labelText: 'Confirm Password',
+            labelStyle: TextStyle(color: Colors.grey, fontSize: 15),
+            prefixIcon: Icon(
+              Icons.lock,
+              color: Colors.grey,
+            ),
+            suffix: IconButton(
+              onPressed: () {
+                setState(() {
+                  isPasswordVisible = !isPasswordVisible;
+                });
+              },
+              icon: Icon(
+                isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                color: Colors.grey,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  ClipRRect _passwordField() {
+    return ClipRRect(
+        borderRadius: BorderRadius.circular(30),
+        child: Container(
+          height: 70,
+          child: TextFormField(
+            obscureText: hidePassword,
+            controller: _passwordController,
+            style: loginTextFieldsStyles,
+            validator: (value) {
+              if (value.isEmpty) {
+                return 'Please Enter Password';
+              }
+              return null;
+            },
+            decoration: InputDecoration(
+              fillColor: Colors.grey[100],
+              filled: true,
+              border: InputBorder.none,
+              // contentPadding: EdgeInsets.fromLTRB(
+              //   20.0,
+              //   15.0,
+              //   20.0,
+              //   15.0,
+              // ),
+              labelText: 'Password',
+              labelStyle: TextStyle(color: Colors.grey, fontSize: 15),
+              prefixIcon: Icon(
+                Icons.lock,
+                color: Colors.grey,
+              ),
+              suffix: IconButton(
+                onPressed: () {
+                  setState(() {
+                    isPasswordVisible = !isPasswordVisible;
+                  });
+                },
+                icon: Icon(
+                  isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                  color: Colors.grey,
+                ),
+              ),
+            ),
+          ),
+        ));
   }
 }
 

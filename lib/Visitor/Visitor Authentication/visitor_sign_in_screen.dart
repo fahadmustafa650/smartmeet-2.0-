@@ -370,7 +370,8 @@ class _VisitorSignInScreenState extends State<VisitorSignInScreen> {
                   hideText = !hideText;
                 });
               },
-              icon: Icon(Icons.remove_red_eye))),
+              icon: Icon(
+                  hideText ? Icons.remove_red_eye : Icons.visibility_off))),
     );
   }
 

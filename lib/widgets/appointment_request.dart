@@ -62,7 +62,8 @@ class _VisitorAppointmentRequestState extends State<VisitorAppointmentRequest> {
               // print('apId=${widget.appointmentRequestData.id}');
               Provider.of<EmployeePendingAppointmentsRequestsProvider>(context,
                       listen: false)
-                  .rejectAppointment(widget.visitorAppointmentRequestData.id)
+                  .rejectSimpleAppointment(
+                      widget.visitorAppointmentRequestData.id)
                   .then((value) {
                 showSnackMessage(context, 'Appointment Request Rejected');
               });
@@ -247,7 +248,7 @@ class _VisitorAppointmentRequestState extends State<VisitorAppointmentRequest> {
     try {
       Provider.of<EmployeePendingAppointmentsRequestsProvider>(context,
               listen: false)
-          .rejectAppointment(widget.visitorAppointmentRequestData.id)
+          .rejectSimpleAppointment(widget.visitorAppointmentRequestData.id)
           .then((value) {
         if (value == 200) {
           showSnackMessage(context, 'Appointment Request Rejected');
@@ -263,7 +264,7 @@ class _VisitorAppointmentRequestState extends State<VisitorAppointmentRequest> {
     try {
       await Provider.of<EmployeePendingAppointmentsRequestsProvider>(context,
               listen: false)
-          .acceptAppointment(widget.visitorAppointmentRequestData.id)
+          .acceptSimpleAppointment(widget.visitorAppointmentRequestData.id)
           .then((value) {
         if (value == 200) {
           showSnackMessage(context, 'Appointment Request Accepted');
