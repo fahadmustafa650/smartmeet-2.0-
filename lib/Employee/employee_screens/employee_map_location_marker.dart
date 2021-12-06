@@ -29,18 +29,36 @@ class _EmployeeMapLocationMarkerState extends State<EmployeeMapLocationMarker> {
   Directions _info;
   Position currentPosition;
   var geolocator = Geolocator();
-
-  void locatePosition() async {
+  var _isLoading = true;
+  Future<void> locatePosition() async {
     Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
-    currentPosition = position;
-    LatLng latLng = LatLng(currentPosition.latitude, currentPosition.longitude);
-    CameraPosition cameraPosition = CameraPosition(
-      target: latLng,
-      zoom: 14.4746,
-    );
-    _googleMapController
-        .animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
+      desiredAccuracy: LocationAccuracy.high,
+    ).then((value) {
+      currentPosition = value;
+      print('currentPosition:== $currentPosition');
+      if (currentPosition != null) {
+        print(currentPosition.latitude);
+        print(currentPosition.longitude);
+        LatLng a = LatLng(33.738045, 73.084488);
+        _addMarker(a);
+        LatLng latLng =
+            LatLng(currentPosition.latitude, currentPosition.longitude);
+        setState(() {
+          _isLoading = false;
+        });
+        CameraPosition cameraPosition = CameraPosition(
+          target: latLng,
+          zoom: 14.4746,
+        );
+
+        _googleMapController
+            .animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
+      }
+
+      return;
+    });
+
+    setState(() {});
   }
 
   @override
@@ -90,66 +108,68 @@ class _EmployeeMapLocationMarkerState extends State<EmployeeMapLocationMarker> {
             )
         ],
       ),
-      body: Stack(
-        alignment: Alignment.center,
-        children: [
-          GoogleMap(
-            myLocationButtonEnabled: true,
-            zoomControlsEnabled: true,
-            myLocationEnabled: true,
-            padding: EdgeInsets.only(bottom: 265.0),
-            initialCameraPosition: _initialCameraPosition,
-            onMapCreated: (controller) {
-              //_googleMapController = controller;
-              locatePosition();
-            },
-            markers: {
-              //if (_origin != null) _origin,
-              if (_officeLocation != null) _officeLocation,
-            },
-            polylines: {
-              if (_info != null)
-                Polyline(
-                  polylineId: const PolylineId('overview_polyline'),
-                  color: Colors.red,
-                  width: 5,
-                  points: _info.polylinePoints
-                      .map((e) => LatLng(e.latitude, e.longitude))
-                      .toList(),
+      body: _isLoading
+          ? CircularProgressIndicator()
+          : Stack(
+              alignment: Alignment.center,
+              children: [
+                GoogleMap(
+                  myLocationButtonEnabled: true,
+                  zoomControlsEnabled: true,
+                  myLocationEnabled: true,
+                  padding: EdgeInsets.only(bottom: 265.0),
+                  initialCameraPosition: _initialCameraPosition,
+                  onMapCreated: (controller) {
+                    //_googleMapController = controller;
+                    locatePosition();
+                  },
+                  markers: {
+                    //if (_origin != null) _origin,
+                    if (_officeLocation != null) _officeLocation,
+                  },
+                  polylines: {
+                    if (_info != null)
+                      Polyline(
+                        polylineId: const PolylineId('overview_polyline'),
+                        color: Colors.red,
+                        width: 5,
+                        points: _info.polylinePoints
+                            .map((e) => LatLng(e.latitude, e.longitude))
+                            .toList(),
+                      ),
+                  },
+                  //onLongPress: _addMarker,
                 ),
-            },
-            onLongPress: _addMarker,
-          ),
-          if (_info != null)
-            Positioned(
-              top: 20.0,
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 6.0,
-                  horizontal: 12.0,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.yellowAccent,
-                  borderRadius: BorderRadius.circular(20.0),
-                  boxShadow: const [
-                    const BoxShadow(
-                      color: Colors.black26,
-                      offset: Offset(0, 2),
-                      blurRadius: 6.0,
-                    )
-                  ],
-                ),
-                child: Text(
-                  '${_info.totalDistance}, ${_info.totalDuration}',
-                  style: const TextStyle(
-                    fontSize: 18.0,
-                    fontWeight: FontWeight.w600,
+                if (_info != null)
+                  Positioned(
+                    top: 20.0,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 6.0,
+                        horizontal: 12.0,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.yellowAccent,
+                        borderRadius: BorderRadius.circular(20.0),
+                        boxShadow: const [
+                          const BoxShadow(
+                            color: Colors.black26,
+                            offset: Offset(0, 2),
+                            blurRadius: 6.0,
+                          )
+                        ],
+                      ),
+                      child: Text(
+                        '${_info.totalDistance}, ${_info.totalDuration}',
+                        style: const TextStyle(
+                          fontSize: 18.0,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
                   ),
-                ),
-              ),
+              ],
             ),
-        ],
-      ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Theme.of(context).primaryColor,
         foregroundColor: Colors.white,

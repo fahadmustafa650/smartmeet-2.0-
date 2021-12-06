@@ -44,7 +44,7 @@ import 'Visitor/Device steps/qr_code_step1.dart';
 import 'Employee/employee_screens/employee_map_location_marker.dart';
 import 'Visitor/RunInAppointment/search_employee_screen.dart';
 import 'Visitor/Appointment/reserve_spot_employee_screen.dart';
-import 'screens/google_map_search_test.dart';
+import 'screens/google_map_search_screen.dart';
 import 'screens/map_screen.dart';
 import 'screens/otp_screen.dart';
 import 'screens/password_changed_successfully.dart';
@@ -53,20 +53,11 @@ import 'screens/test_api.dart';
 import 'screens/test_image_picker.dart';
 import 'package:smart_meet/models/message_model.dart';
 import 'screens/test_list_screen.dart';
+import 'screens/test_notification_screen.dart';
 import 'screens/test_ocr.dart';
 import 'Employee/employee_screens/emp_sign_in_screen.dart';
 import 'Employee/EmployeeForgetPassword/employee_new_password_screen.dart';
 import 'Visitor/Appointment/search_result_screen.dart';
-
-const AndroidNotificationChannel channel = AndroidNotificationChannel(
-  'high_importance_channel',
-  'High Importance Channel',
-  'This Channel is used for important notifications',
-  importance: Importance.high,
-  playSound: true,
-);
-final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-    FlutterLocalNotificationsPlugin();
 
 // Future<void> _firebaseMessagingBackgroundHandler(
 //     RemoteMessage remoteMessage) async {
@@ -112,7 +103,7 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
         debugShowMaterialGrid: false,
-        home: VisitorSignUpScreen(),
+        home: NotificationTestScreen(),
         // initialRoute: RequestAppointmentScreen.id,
         debugShowCheckedModeBanner: false,
         routes: {
@@ -156,84 +147,6 @@ class MyApp extends StatelessWidget {
           VisitorPendingAppointmentsScreen.id: (context) =>
               VisitorPendingAppointmentsScreen(),
         },
-      ),
-    );
-  }
-}
-
-class TestScreen extends StatefulWidget {
-  TestScreen({Key key, this.title}) : super(key: key);
-
-  final String title;
-  @override
-  _TestScreenState createState() => _TestScreenState();
-}
-
-class _TestScreenState extends State<TestScreen> {
-  int _counter = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    FirebaseMessaging.onBackgroundMessage((message) {
-      return null;
-    });
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      // print('A new onMessageOpenedApp event was published!');
-      RemoteNotification notification = message.notification;
-      AndroidNotification android = message.notification?.android;
-      if (notification != null && android != null) {
-        showDialog(
-            context: context,
-            builder: (_) {
-              return AlertDialog(
-                title: Text(notification.title),
-                content: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [Text(notification.body)],
-                  ),
-                ),
-              );
-            });
-      }
-    });
-  }
-
-  void showNotification() {
-    setState(() {
-      _counter++;
-    });
-    flutterLocalNotificationsPlugin.show(
-      0,
-      "Testing $_counter",
-      "How you doing ?",
-      NotificationDetails(
-        android: AndroidNotificationDetails(
-            channel.id, channel.name, channel.description,
-            importance: Importance.high,
-            color: Colors.blue,
-            playSound: true,
-            icon: '@mipmap/ic_launcher'),
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('App Title'),
-      ),
-      body: Center(
-        child: Text(
-          'You have pushed the button this many times: \n$_counter',
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: showNotification,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
       ),
     );
   }

@@ -9,14 +9,14 @@ import 'package:smart_meet/providers/employee_provider.dart';
 import 'package:smart_meet/Constants/constants.dart';
 // const mapApiKey = 'AIzaSyAofr6MTAVjER_EanHr_GFsMGzOcehOeUU';
 
-class MapSample extends StatefulWidget {
+class GoogleMapSearchScreen extends StatefulWidget {
   final String employeeId;
-  MapSample({this.employeeId});
+  GoogleMapSearchScreen({this.employeeId});
   @override
-  State<MapSample> createState() => MapSampleState();
+  State<GoogleMapSearchScreen> createState() => GoogleMapSearchScreenState();
 }
 
-class MapSampleState extends State<MapSample> {
+class GoogleMapSearchScreenState extends State<GoogleMapSearchScreen> {
   Completer<GoogleMapController> _controller = Completer();
   final _searchController = TextEditingController();
   Marker _employeeOfficeMarker;
