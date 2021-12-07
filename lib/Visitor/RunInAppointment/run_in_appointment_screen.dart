@@ -1,5 +1,5 @@
 import 'dart:convert';
-
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -31,6 +31,7 @@ class _RunInAppointmentScreenState extends State<RunInAppointmentScreen> {
   final _companyController = TextEditingController();
   //final _messageController = TextEditingController();
   final _visitorReasonField = TextEditingController();
+  FirebaseMessaging _fcm = FirebaseMessaging.instance;
   //DateTime _selectedDate = DateTime.now();
   var _isLoading = false;
   String _selectedStartTime;

@@ -103,7 +103,7 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
         debugShowMaterialGrid: false,
-        home: NotificationTestScreen(),
+        home: EmployeeSignInScreen(),
         // initialRoute: RequestAppointmentScreen.id,
         debugShowCheckedModeBanner: false,
         routes: {

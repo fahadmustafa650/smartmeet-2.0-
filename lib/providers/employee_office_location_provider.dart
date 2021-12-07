@@ -8,6 +8,7 @@ import 'package:smart_meet/models/employee_location.dart';
 
 class EmployeeOfficeLocationProvider with ChangeNotifier {
   EmployeeLocation _employeeLocation;
+
   Future<EmployeeLocation> getEmployeeLocation(String employeeId) async {
     final url = Uri.parse(
         'https://pure-woodland-42301.herokuapp.com/api/employee_location/$employeeId');
@@ -26,7 +27,7 @@ class EmployeeOfficeLocationProvider with ChangeNotifier {
   }
 
   void saveLocation(String employeeId, LatLng latLng) async {
-    print('providerEmp=$employeeId');
+    print('providerEmpId=$employeeId');
     print('providerLong=${latLng.longitude}');
     print('providerLat=${latLng.latitude}');
     final url = Uri.parse(
