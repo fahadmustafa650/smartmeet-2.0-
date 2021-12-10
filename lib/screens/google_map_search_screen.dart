@@ -42,9 +42,9 @@ class GoogleMapSearchScreenState extends State<GoogleMapSearchScreen> {
         'https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=$input&inputtype=textquery&key=$mapApiKey');
     var response = await http.get(url);
     var json = jsonDecode(response.body);
-    print(response.body);
+    //print(response.body);
     var placeId = json['candidates'][0]['place_id'] as String;
-    print('placeId=$placeId');
+    //print('placeId=$placeId');
     return placeId;
   }
 
