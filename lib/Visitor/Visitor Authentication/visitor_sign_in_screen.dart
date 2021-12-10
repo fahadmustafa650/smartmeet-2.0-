@@ -10,6 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smart_meet/Constants/constants.dart';
 import 'package:smart_meet/Visitor/VisitorForgetPassword/visitor_enter_email_screen.dart';
 import 'package:smart_meet/Visitor/visitor_home_screen.dart';
+import 'package:smart_meet/providers/firebase_messaging_provider.dart';
 import 'package:smart_meet/widgets/login_with_fb.dart';
 import 'package:smart_meet/widgets/login_with_google.dart';
 
@@ -64,6 +65,8 @@ class _VisitorSignInScreenState extends State<VisitorSignInScreen> {
   }
 
   void signIn() async {
+    var token = await FirebaseMessagingProvider().getToken();
+    print(token);
     final _isValid = _formKey.currentState.validate();
     final url = Uri.parse(
         'https://pure-woodland-42301.herokuapp.com/api/visitor/signin');
@@ -86,6 +89,7 @@ class _VisitorSignInScreenState extends State<VisitorSignInScreen> {
         body: jsonEncode(<String, String>{
           'email': _emailController.text,
           'password': _passwordController.text,
+          'token': token,
         }),
       );
       // print(response.body);

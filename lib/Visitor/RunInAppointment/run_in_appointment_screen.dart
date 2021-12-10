@@ -1,7 +1,12 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:date_time_picker/date_time_picker.dart';
 import 'package:image_picker/image_picker.dart';
@@ -11,6 +16,7 @@ import 'package:smart_meet/Constants/constants.dart';
 import 'package:smart_meet/Visitor/Appointment/appointment_sent_screen.dart';
 import 'package:smart_meet/api/firebase_api.dart';
 import 'package:smart_meet/providers/visitor_provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 // import 'reserve_spot_employee_screen.dart';
 import 'dart:io' as io;
 import 'package:http/http.dart' as http;
@@ -18,6 +24,8 @@ import 'package:path/path.dart';
 
 class RunInAppointmentScreen extends StatefulWidget {
   static final id = '/run_in_appoinment_screen';
+  final String employeeId;
+  RunInAppointmentScreen({this.employeeId});
   @override
   _RunInAppointmentScreenState createState() => _RunInAppointmentScreenState();
 }
@@ -29,18 +37,88 @@ class _RunInAppointmentScreenState extends State<RunInAppointmentScreen> {
   final _lastNameController = TextEditingController();
   final _emailController = TextEditingController();
   final _companyController = TextEditingController();
+  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
+
   //final _messageController = TextEditingController();
   final _visitorReasonField = TextEditingController();
+  final FirebaseFirestore _db = FirebaseFirestore.instance;
+  var _fcm;
   //DateTime _selectedDate = DateTime.now();
   var _isLoading = false;
   String _selectedStartTime;
   String _selectedEndTime;
   String profilePicError = '';
   var _selectedStartTime24Hour;
+  StreamSubscription iosSubscription;
   UploadTask task;
   String _imageUrl;
   //file
   io.File _image;
+
+  void initState() {
+    super.initState();
+    // if (Platform.isIOS) {
+    //   iosSubscription = _fcm.onIosSettingsRegistered.listen((data) {
+    //     _saveDeviceToken();
+    //   });
+
+    //   _fcm.requestNotificationPermissions(IOSInitializationSettings());
+    // } else {
+    //   _saveDeviceToken();
+    // }
+    // _fcm.configure(
+    //   onMessage: (Map<String, dynamic> message) async {
+    //     print("onMessage: $message");
+    //     showDialog(
+    //       // context: context,
+    //       builder: (context) => AlertDialog(
+    //         content: ListTile(
+    //           title: Text(message['notification']['title']),
+    //           subtitle: Text(message['notification']['body']),
+    //         ),
+    //         actions: <Widget>[
+    //           FlatButton(
+    //             child: Text('Ok'),
+    //             onPressed: () => Navigator.of(context).pop(),
+    //           ),
+    //         ],
+    //       ),
+    //     );
+    //   },
+    //   onLaunch: (Map<String, dynamic> message) async {
+    //     print("onLaunch: $message");
+    //     // TODO optional
+    //   },
+    //   onResume: (Map<String, dynamic> message) async {
+    //     print("onResume: $message");
+    //     // TODO optional
+    //   },
+    // );
+  }
+
+  AndroidNotificationChannel channel = const AndroidNotificationChannel(
+    'high_importance_channel', // id
+    'High Importance Notifications', // title// description
+    importance: Importance.high,
+  );
+
+  _saveDeviceToken() async {
+    // Get the token for this device
+    String fcmToken = widget.employeeId;
+
+    // Save it to Firestore
+    if (fcmToken != null) {
+      var tokens = _db.collection('users').doc(fcmToken);
+
+      await tokens.set({
+        'token': fcmToken,
+        'createdAt': FieldValue.serverTimestamp(), // optional
+        'platform': Platform.operatingSystem // optional
+      });
+    }
+  }
+
   void postData(BuildContext context) async {
     //Logged In Visitor Id will be entered
     // String visitorId = '61292ccba64b18000460842a';
@@ -186,6 +264,7 @@ class _RunInAppointmentScreenState extends State<RunInAppointmentScreen> {
   }
 
   Future<void> _selectEndTime(BuildContext context) async {
+    print('selectedStartTime24Hour=${_selectedStartTime}');
     if (_selectedStartTime == null) {
       //_selectedEndTime = null;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -455,8 +534,29 @@ class _RunInAppointmentScreenState extends State<RunInAppointmentScreen> {
 
   GestureDetector _requestAppointmentBtn(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        postData(context);
+      onTap: () async {
+        // postData(context);
+        String _token = await FirebaseMessaging.instance.getToken();
+        print(_token);
+
+        FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+          RemoteNotification notification = message.notification;
+          AndroidNotification android = message.notification?.android;
+          if (notification != null && android != null && !kIsWeb) {
+            flutterLocalNotificationsPlugin.show(
+              notification.hashCode,
+              notification.title,
+              notification.body,
+              NotificationDetails(
+                android: AndroidNotificationDetails(
+                  channel.id,
+                  channel.name,
+                  icon: 'app_icon',
+                ),
+              ),
+            );
+          }
+        });
         //Navigator.pushNamed(context, AppointmentSentScreen.id);
       },
       child: Container(

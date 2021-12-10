@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:smart_meet/Visitor/Appointment/search_result_screen.dart';
 
-class EmployeeSearchBarScreen extends StatefulWidget {
+class RunInEmployeeSearchBarScreen extends StatefulWidget {
   static final id = '/employee_search_bar';
-  EmployeeSearchBarScreen({Key key}) : super(key: key);
+  RunInEmployeeSearchBarScreen({Key key}) : super(key: key);
 
   @override
-  _EmployeeSearchBarScreenState createState() =>
-      new _EmployeeSearchBarScreenState();
+  _RunInEmployeeSearchBarScreenState createState() =>
+      new _RunInEmployeeSearchBarScreenState();
 }
 
-class _EmployeeSearchBarScreenState extends State<EmployeeSearchBarScreen> {
+class _RunInEmployeeSearchBarScreenState extends State<RunInEmployeeSearchBarScreen> {
   TextEditingController searchController = TextEditingController();
   @override
   void dispose() {

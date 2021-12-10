@@ -10,6 +10,7 @@ import 'package:smart_meet/Employee/EmployeeForgetPassword/employee_enter_email_
 import 'package:smart_meet/Employee/EmployeeForgetPassword/employee_new_password_screen.dart';
 import 'package:smart_meet/Employee/employee_screens/emp_sign_up_screen.dart';
 import 'package:smart_meet/Employee/employee_screens/employee_home_screen.dart';
+import 'package:smart_meet/providers/firebase_messaging_provider.dart';
 import 'package:smart_meet/widgets/login_with_fb.dart';
 import 'package:smart_meet/widgets/login_with_google.dart';
 
@@ -62,6 +63,8 @@ class _EmployeeSignInScreenState extends State<EmployeeSignInScreen> {
   }
 
   void _signIn() async {
+    var token = await FirebaseMessagingProvider().getToken();
+    print(token);
     final _isValid = _formKey.currentState.validate();
     final url = Uri.parse(
         'https://pure-woodland-42301.herokuapp.com/api/employee/signin');
@@ -84,6 +87,7 @@ class _EmployeeSignInScreenState extends State<EmployeeSignInScreen> {
         body: jsonEncode(<String, String>{
           'email': _emailController.text,
           'password': _passwordController.text,
+          'token': token,
         }),
       );
       print(response.body);
@@ -314,6 +318,15 @@ class _EmployeeSignInScreenState extends State<EmployeeSignInScreen> {
   AppBar _appBar() {
     return AppBar(
       centerTitle: true,
+      leading: IconButton(
+        icon: Icon(
+          Icons.arrow_back,
+          color: Colors.black,
+        ),
+        onPressed: () {
+          Navigator.pop(context);
+        },
+      ),
       title: Text(
         'Employee Sign In',
         style: TextStyle(

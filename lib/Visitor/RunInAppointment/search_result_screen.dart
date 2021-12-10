@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:smart_meet/Visitor/Appointment/request_appoinment_screen.dart';
 import 'package:smart_meet/models/employee_model.dart';
+import 'package:smart_meet/models/runInAppointment_model.dart';
 import 'run_in_appointment_screen.dart';
 import 'search_employee_screen.dart';
 import 'package:http/http.dart' as http;
@@ -159,10 +160,18 @@ class EmployeeInfoContainer extends StatelessWidget {
                   ),
                   GestureDetector(
                     onTap: () {
-                      Navigator.pushNamed(context, RunInAppointmentScreen.id,
-                          arguments: {
-                            'employeeId': employeeData.id,
-                          });
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => RunInAppointmentScreen(
+                            employeeId: employeeData.id,
+                          ),
+                        ),
+                      );
+                      // Navigator.pushNamed(context, RunInAppointmentScreen.id,
+                      //     arguments: {
+                      //       'employeeId': employeeData.id,
+                      //     });
                     },
                     child: Container(
                       width: screenWidth * 0.45,

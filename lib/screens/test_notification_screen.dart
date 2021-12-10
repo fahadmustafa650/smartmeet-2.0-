@@ -1,14 +1,30 @@
+import 'dart:async';
+import 'dart:io';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
-// var AndroidNotificationChannel channel = AndroidNotificationChannel(
-//   'high_importance_channel',
-//   'High Importance Channel',
-//   'This Channel is used for important notifications',
-//   importance: Importance.high,
-//   playSound: true,
-// );
+// Copyright 2019 The Chromium Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE
+
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
+import 'package:provider/provider.dart';
+import 'package:smart_meet/providers/firebase_messaging_provider.dart';
+
+/// Define a top-level named handler which background/terminated messages will
+/// call.
+///
+/// To verify things are working, check out the native platform logs.
+
+AndroidNotificationChannel channel = const AndroidNotificationChannel(
+  'high_importance_channel', // id
+  'High Importance Notifications', // title// description
+  importance: Importance.high,
+);
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
@@ -22,71 +38,68 @@ class NotificationTestScreen extends StatefulWidget {
 }
 
 class _NotificationTestScreenState extends State<NotificationTestScreen> {
-  int _counter = 0;
+  /// Initialize the [FlutterLocalNotificationsPlugin] package.
+  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
 
-  final AndroidNotificationChannel channel = AndroidNotificationChannel(
-    '123',
-    'High Importance Channel',
-    'This Channel is used for important notifications',
-    importance: Importance.high,
-    playSound: true,
-  );
   @override
   void initState() {
     super.initState();
-    // FirebaseMessaging.onBackgroundMessage((message) {
-    //   print('message: $message');
-    //   return null;
+    // gettoken();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<FirebaseMessagingProvider>().initFCM();
+    });
+
+    // FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    //   RemoteNotification notification = message.notification;
+    //   AndroidNotification android = message.notification?.android;
+    //   if (notification != null && android != null && !kIsWeb) {
+    //     flutterLocalNotificationsPlugin.show(
+    //       notification.hashCode,
+    //       notification.title,
+    //       notification.body,
+    //       NotificationDetails(
+    //         android: AndroidNotificationDetails(
+    //           channel.id,
+    //           channel.name,
+    //           icon: 'app_icon',
+    //         ),
+    //       ),
+    //     );
+    //   }
     // });
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      // print('A new onMessageOpenedApp event was published!');
-      RemoteNotification notification = message.notification;
-      AndroidNotification android = message.notification?.android;
-      if (notification != null && android != null) {
-        showDialog(
-            context: context,
-            builder: (_) {
-              return AlertDialog(
-                title: Text(notification.title),
-                content: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [Text(notification.body)],
-                  ),
-                ),
-              );
-            });
-      }
-    });
+
+    // _fcm.configure(
+    //   onMessage: (Map<String, dynamic> message) async {
+    //     print("onMessage: $message");
+    //     showDialog(
+    //       context: context,
+    //       builder: (context) => AlertDialog(
+    //         content: ListTile(
+    //           title: Text(message['notification']['title']),
+    //           subtitle: Text(message['notification']['body']),
+    //         ),
+    //         actions: <Widget>[
+    //           FlatButton(
+    //             child: Text('Ok'),
+    //             onPressed: () => Navigator.of(context).pop(),
+    //           ),
+    //         ],
+    //       ),
+    //     );
+    //   },
+    //   onLaunch: (Map<String, dynamic> message) async {
+    //     print("onLaunch: $message");
+    //     // TODO optional
+    //   },
+    //   onResume: (Map<String, dynamic> message) async {
+    //     print("onResume: $message");
+    //     // TODO optional
+    //   },
+    // );
   }
 
-  void showNotification() {
-    print('id=${channel.id}');
-    print('name=${channel.name}');
-    print('description=${channel.description}');
-    setState(() {
-      _counter++;
-    });
-
-    if (channel.id == '123') {
-      flutterLocalNotificationsPlugin.show(
-        0,
-        "Testing $_counter",
-        "How you doing ?",
-        NotificationDetails(
-          android: AndroidNotificationDetails(
-            channel.id,
-            channel.name,
-            channel.description,
-            importance: Importance.high,
-            color: Colors.blue,
-            playSound: true,
-            icon: '@mipmap/ic_launcher',
-          ),
-        ),
-      );
-    }
-  }
+  String _token;
 
   @override
   Widget build(BuildContext context) {
@@ -96,14 +109,19 @@ class _NotificationTestScreenState extends State<NotificationTestScreen> {
       ),
       body: Center(
         child: Text(
-          'You have pushed the button this many times: \n$_counter',
+          'You have pushed the button this many times:',
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: showNotification,
+        onPressed: () {},
         tooltip: 'Increment',
         child: Icon(Icons.add),
       ),
     );
+  }
+
+  gettoken() async {
+    _token = await FirebaseMessaging.instance.getToken();
+    print(_token);
   }
 }
